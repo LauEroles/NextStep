@@ -39,9 +39,74 @@
 ****> Crear componente de notificación para mostrar mensajes de éxito/error
 
 ** Modulo de vacantes y Postulaciones
+*** Backend
+****> Crear entidad Vacante con campos necesarios
+****> Crear endpoints CRUD para vacantes con rol Reclutador y Admin. Solo crear y editar vacantes para el reclutador que las creó
+
+*** Postulaciones y etapas — Backend
+****> Crear entidad Postulación con relación a Vacante y Usuario
+****> Crear endpoints para que candidatos puedan postular a vacantes
+****> Crear endpoint para mover candidato entre etapas
+****> Crear endpoint para que candidatos puedan ver el estado de sus postulaciones
+
+*** Panel Reclutador — Frontend
+****> Crear página para que reclutadores puedan crear y gestionar vacantes Tabla con estado, cantidad candidatos, acciones editar o cerrar
+****> Crear página para que reclutadores puedan ver y gestionar postulaciones
+****> Implementar lógica para mover candidatos entre etapas
+****> Crear página para que candidatos puedan ver el estado de sus postulaciones Columnas por etapa
+****> Visualizar detalles de cada postulacion: cv, portfolio, historial de etapas, boton carga de feedback
+
+*** Panel Candidato — Frontend
+****> Crear página para que candidatos puedan ver y gestionar sus postulaciones
+****> Crear pagina para creacion y edicion de perfil con campos relevantes para el proceso de selección
+****> Búsqueda y listado de vacantes disponibles
+****> Subida de archivos CV y Portfolio
 
 
 ** Modulo de Feedback y dashboard
+*** Feedback — Backend
+****> Crear entidad Feedback con relación a Postulación y Usuario
+****> Crear endpoint para que reclutadores puedan dejar feedback a candidatos
+****> Crear endpoint para que candidatos puedan ver el feedback recibido
+****> Lógica de recomendaciones mockeadas Ver de implementar LLM para recomendaciones personalizadas
+
+*** Notificaciones — Backend
+****> Crear entidad Notificación con relación a Usuario
+****> Crear endpoint para crear notificaciones (ejemplo: cuando un candidato se mueve de etapa)
+****> Crear endpoint para que usuarios puedan ver sus notificaciones
+****> Crear endpoint para marcar notificaciones como leídas
+
+***  Dashboard Candidato — Frontend
+****> Crear página de dashboard para candidatos con resumen de postulaciones, feedback recibido y notificaciones
+****> Visualizar score de match, habilidades técnicas vs soft skills. Ver de implementar LLM para recomendaciones personalizadas de vacantes y hacerlo tipo vista kanban con tarjetas de vacantes recomendadas
+****> Feedback por etapa, sección de recomendaciones (cursos, roadmap, roles similares)
+****> Formulario de feedback para el reclutador
+
 ** Testing , integracion y Ajustes Finales
+*** Testing Backend
+****> Escribir tests unitarios para servicios y controladores clave
+****> Escribir tests de integración para endpoints críticos
+
+*** Testing Frontend
+****> Escribir tests unitarios para componentes clave
+****> Escribir tests de integración para flujos críticos (ejemplo: proceso de postulación)
+
+*** Integración y bugs
+****> Probar integración completa entre frontend y backend
+****> Corregir bugs y mejorar UX/UI basado en feedback
+****> Validaciones finales, manejo de errores y optimizaciones de rendimiento
+****> Validaciones, revisión de seguridad y protección de datos
+****> Diseño responsive y pruebas en diferentes dispositivos
+
+
 ** Deploy, presentacion y Documentacion Final
+*** Deploy
+****> Deploy del backend
+****> Deploy del frontend
+
+*** Documentación
+****> Documentar API con Swagger
+****> Documentar README con instrucciones de uso y detalles del proyecto
+****> Informte técnico final con arquitectura, decisiones de diseño y posibles mejoras futuras
+
 @endwbs
