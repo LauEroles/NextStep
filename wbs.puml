@@ -1,0 +1,47 @@
+	
+@startwbs
+* NextSteps Business Process Modelling WBS
+
+** Configuracion del proyecto y arquitectura base
+*** Setup del repositorio
+****> Crear estructura de carpetas
+****> Configurar GitHub
+
+*** Backend NestJS inicial
+****> estructura de módulos base con NestJS
+****> Crear DER y entidades TypeORM con relaciones, enum de roles 
+****> Configurar Swagger para documentación de API
+
+*** Frontend NextJS inicial
+****> Crear proyecto NextJS con TypeScript
+****> Configurar estructura de carpetas y rutas base
+****> Configurar cliente HTTP
+
+*** Infraestructura y despliegue
+***> Documentar README con instrucciones de setup
+
+** Autenticacion y gestión de usuarios
+*** Auth — Backend
+****> Login y Auth
+****> Crear endpoint de registro de usuario
+****> Hasheo de contraseña
+
+*** CRUD Usuarios — Backend Rol Admin
+****> Crear endpoints CRUD para usuarios con rol Admin
+****> Implementar validaciones y manejo de errores -DTOs
+****> crear usuario admin por defecto
+
+*** Frontend
+****> Crear páginas de Login y Registro con formularios
+****> Implementar lógica de autenticación y manejo de tokens
+****> Crear dashboard de administración para gestión de usuarios
+****> Mostrar menú diferente según CANDIDATO / RECLUTADOR / ADMIN
+****> Crear componente de notificación para mostrar mensajes de éxito/error
+
+** Modulo de vacantes y Postulaciones
+
+
+** Modulo de Feedback y dashboard
+** Testing , integracion y Ajustes Finales
+** Deploy, presentacion y Documentacion Final
+@endwbs
