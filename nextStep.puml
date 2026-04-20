@@ -1,0 +1,76 @@
+@startuml NextStep
+
+class JobOffer{
+    -String title
+    -String descripcion
+    -number idRecruiter
+    -number idJobOffer
+    'list of skills with dropdown of skills
+    -String softSkills
+    'list of tech with dropdown of skills 
+    -String techSkills  
+    'dropdown 1-10???? Ver si usamos otro selector
+    -number score
+    -String seniority
+    -Date createDate
+    -Date closeDate
+    -boolean isActive
+
+    +getJobOfferDetails()
+    +setJobOfferDetails()
+
+}
+
+interface identifiable{
+    +generateId()
+}
+
+'todos deberian tener id solo que son son id diferentes 
+'se puede armar una interfaz o una abstracta que implemente la logica de generacion de id y que cada clase tenga su propio id con el mismo metodo de generacion
+abstract Class User{
+    -string name
+    -string surname
+    -string email
+    -string password
+    'number idUser consultar Ale?
+    
+    +getUserDetails()
+
+
+}
+
+
+Class Applican extends User{
+    - number idApplicant
+
+}
+
+
+Class Recruiter extends User{
+
+    +createJobOffer()
+    +deleteJobOffer()
+    'disabile job offer instead of delete
+
+}
+
+
+
+Class Admin extends User{
+
+}
+
+
+class Feedback{
+    -number idFeedback
+    -number idApplicant
+    -number idRecruiter
+    -number idJobOffer
+    -String feedbackText
+
+}
+
+'Relationships
+
+
+@enduml

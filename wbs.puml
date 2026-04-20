@@ -1,112 +1,125 @@
-	
-@startwbs
-* NextSteps Business Process Modelling WBS
+@startwbs Nexstep MVP WBS
+* NextStep MVP WBS
 
-** Configuracion del proyecto y arquitectura base
-*** Setup del repositorio
-****> Crear estructura de carpetas
-****> Configurar GitHub
+** Configuración inicial del proyecto
 
-*** Backend NestJS inicial
-****> estructura de módulos base con NestJS
-****> Crear DER y entidades TypeORM con relaciones, enum de roles 
-****> Configurar Swagger para documentación de API
+*** Repositorio y entorno
+**** Crear repositorio GitHub
+**** Definir estructura de carpetas frontend / backend
+**** Documentar instalación inicial en README
 
-*** Frontend NextJS inicial
-****> Crear proyecto NextJS con TypeScript
-****> Configurar estructura de carpetas y rutas base
-****> Configurar cliente HTTP
+*** Backend base NestJS
+**** Crear proyecto NestJS
+**** Configurar módulos principales
+**** Configurar TypeORM + PostgreSQL
+**** Configurar Swagger
 
-*** Infraestructura y despliegue
-***> Documentar README con instrucciones de setup
+*** Frontend base NextJS
+**** Crear proyecto NextJS con TypeScript
+**** Configurar TailwindCSS
+**** Definir estructura de páginas y componentes
+**** Configurar cliente HTTP
 
-** Autenticacion y gestión de usuarios
-*** Auth — Backend
-****> Login y Auth
-****> Crear endpoint de registro de usuario
-****> Hasheo de contraseña
+** Autenticación y usuarios
 
-*** CRUD Usuarios — Backend Rol Admin
-****> Crear endpoints CRUD para usuarios con rol Admin
-****> Implementar validaciones y manejo de errores -DTOs
-****> crear usuario admin por defecto
+*** Backend
+**** Crear entidad User
+**** Definir roles ADMIN / RECRUITER / APPLICANT
+**** Endpoint registro
+
+*** Administración
+**** CRUD usuarios básico para Admin
 
 *** Frontend
-****> Crear páginas de Login y Registro con formularios
-****> Implementar lógica de autenticación y manejo de tokens
-****> Crear dashboard de administración para gestión de usuarios
-****> Mostrar menú diferente según CANDIDATO / RECLUTADOR / ADMIN
-****> Crear componente de notificación para mostrar mensajes de éxito/error
+**** Página Login
+**** Página Registro
+**** Redirección según rol
+**** Menú dinámico por perfil
 
-** Modulo de vacantes y Postulaciones
+** Módulo Vacantes
+
 *** Backend
-****> Crear entidad Vacante con campos necesarios
-****> Crear endpoints CRUD para vacantes con rol Reclutador y Admin. Solo crear y editar vacantes para el reclutador que las creó
+**** Crear entidad JobOffer
+**** CRUD vacantes
+**** Validar que recruiter solo crea, edita y elimina sus vacantes
+**** Listar vacantes activas
 
-*** Postulaciones y etapas — Backend
-****> Crear entidad Postulación con relación a Vacante y Usuario
-****> Crear endpoints para que candidatos puedan postular a vacantes
-****> Crear endpoint para mover candidato entre etapas
-****> Crear endpoint para que candidatos puedan ver el estado de sus postulaciones
+*** Frontend Recruiter
+**** Dashboard recruiter
+**** Formulario crear vacante
+**** Listado de mis vacantes
+**** Editar / cerrar (actualiza estado) vacante
 
-*** Panel Reclutador — Frontend
-****> Crear página para que reclutadores puedan crear y gestionar vacantes Tabla con estado, cantidad candidatos, acciones editar o cerrar
-****> Crear página para que reclutadores puedan ver y gestionar postulaciones
-****> Implementar lógica para mover candidatos entre etapas
-****> Crear página para que candidatos puedan ver el estado de sus postulaciones Columnas por etapa
-****> Visualizar detalles de cada postulacion: cv, portfolio, historial de etapas, boton carga de feedback
+*** Frontend Candidato
+**** Página listado de vacantes
+**** Vista detalle vacante
 
-*** Panel Candidato — Frontend
-****> Crear página para que candidatos puedan ver y gestionar sus postulaciones
-****> Crear pagina para creacion y edicion de perfil con campos relevantes para el proceso de selección
-****> Búsqueda y listado de vacantes disponibles
-****> Subida de archivos CV y Portfolio
+** Módulo Postulaciones
 
+*** Backend
+**** Crear entidad Postulación
+**** Endpoint postularse a vacante
+**** Endpoint listar postulantes por vacante
+**** Endpoint cambiar estado postulación
 
-** Modulo de Feedback y dashboard
-*** Feedback — Backend
-****> Crear entidad Feedback con relación a Postulación y Usuario
-****> Crear endpoint para que reclutadores puedan dejar feedback a candidatos
-****> Crear endpoint para que candidatos puedan ver el feedback recibido
-****> Lógica de recomendaciones mockeadas Ver de implementar LLM para recomendaciones personalizadas
+*** Frontend Recruiter
+**** Página postulantes por vacante
+**** Cambiar estado candidato
 
-*** Notificaciones — Backend
-****> Crear entidad Notificación con relación a Usuario
-****> Crear endpoint para crear notificaciones (ejemplo: cuando un candidato se mueve de etapa)
-****> Crear endpoint para que usuarios puedan ver sus notificaciones
-****> Crear endpoint para marcar notificaciones como leídas
+*** Frontend Candidato
+**** Página mis postulaciones
+**** Visualizar estado del proceso
 
-***  Dashboard Candidato — Frontend
-****> Crear página de dashboard para candidatos con resumen de postulaciones, feedback recibido y notificaciones
-****> Visualizar score de match, habilidades técnicas vs soft skills. Ver de implementar LLM para recomendaciones personalizadas de vacantes y hacerlo tipo vista kanban con tarjetas de vacantes recomendadas
-****> Feedback por etapa, sección de recomendaciones (cursos, roadmap, roles similares)
-****> Formulario de feedback para el reclutador
+** Módulo Feedback
 
-** Testing , integracion y Ajustes Finales
-*** Testing Backend
-****> Escribir tests unitarios para servicios y controladores clave
-****> Escribir tests de integración para endpoints críticos
+*** Backend
+**** Crear entidad Feedback
+**** Endpoint crear feedback recruiter (POST)
+**** Endpoint ver feedback candidato(GET)
 
-*** Testing Frontend
-****> Escribir tests unitarios para componentes clave
-****> Escribir tests de integración para flujos críticos (ejemplo: proceso de postulación)
+*** Frontend Recruiter
+**** Formulario cargar feedback
 
-*** Integración y bugs
-****> Probar integración completa entre frontend y backend
-****> Corregir bugs y mejorar UX/UI basado en feedback
-****> Validaciones finales, manejo de errores y optimizaciones de rendimiento
-****> Validaciones, revisión de seguridad y protección de datos
-****> Diseño responsive y pruebas en diferentes dispositivos
+*** Frontend Candidato
+**** Página mi feedback
+**** Ver puntaje técnico
+**** Ver puntaje soft skills
+**** Ver comentario general
 
+** Dashboard y perfiles
 
-** Deploy, presentacion y Documentacion Final
+*** Candidato
+**** Página perfil candidato
+**** Dashboard con postulaciones + estados + feedback
+
+*** Recruiter
+**** Página perfil recruiter
+**** Dashboard resumen vacantes + postulantes (números)
+
+** Testing y ajustes finales
+
+*** Backend
+**** Test endpoints principales
+**** Validaciones y manejo de errores
+
+*** Frontend
+**** Probar navegación general
+**** Validar formularios
+
+*** Integración
+**** Pruebas frontend + backend
+**** Corrección de bugs
+**** Responsive básico
+
+** Deploy y entrega final
+
 *** Deploy
-****> Deploy del backend
-****> Deploy del frontend
+**** Deploy backend
+**** Deploy frontend
 
 *** Documentación
-****> Documentar API con Swagger
-****> Documentar README con instrucciones de uso y detalles del proyecto
-****> Informte técnico final con arquitectura, decisiones de diseño y posibles mejoras futuras
+**** README final
+**** Swagger actualizado
+**** Informe técnico breve (incluye documento funcional, no funcional técnico, de arquitectura C4model )
 
 @endwbs
