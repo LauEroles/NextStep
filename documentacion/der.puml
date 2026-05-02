@@ -1,0 +1,66 @@
+@startuml NextStep DER
+
+entity "users" as users {
+  * id : number <<PK>>
+  --
+  * email : VARCHAR(255)
+  * password : VARCHAR(255)
+  * first_name : VARCHAR(100)
+  * last_name : VARCHAR(100)
+  * role : ENUM(ADMIN, RECRUITER, APPLICANT)
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "job_offers" as job_offers {
+  * id : number <<PK>>
+  --
+  * recruiter_id : number <<FK>>
+  * title : VARCHAR(255)
+  * description : TEXT
+  * seniority : ENUM(JUNIOR, SEMI_SENIOR, SENIOR)
+  * skills_required : VARCHAR(500)
+  * status : ENUM(ACTIVE, INACTIVE)
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "applications" as applications {
+  * id : number <<PK>>
+  --
+  * applicant_id : number <<FK>>
+  * job_offer_id : number <<FK>>
+  * status : ENUM(APPLIED, IN_REVIEW, INTERVIEW, DESESTIMATED, APPROVED, OFFER)
+  applied_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "feedback" as feedback {
+  * id : number <<PK>>
+  --
+  * application_id : number <<FK>>
+  * recruiter_id : number <<FK>>
+  * technical_score : INT
+  * soft_skills_score : INT
+  * comment : TEXT
+  created_at : TIMESTAMP
+}
+
+entity "audit_logs" as audit_logs {
+  * id : number <<PK>>
+  --
+  * user_id : number <<FK>>
+  * action : VARCHAR(100)
+  * entity : VARCHAR(100)
+  entity_id : VARCHAR(255)
+  metadata : JSONB
+  created_at : TIMESTAMP
+}
+
+users          ||--o{ job_offers   : "crea"
+users          ||--o{ applications : "se postula"
+job_offers     ||--o{ applications : "recibe"
+applications   ||--o| feedback     : "tiene"
+users          ||--o{ audit_logs   : "genera"
+
+@enduml
