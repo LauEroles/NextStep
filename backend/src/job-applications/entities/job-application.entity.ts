@@ -36,6 +36,6 @@ export class JobApplication {
   })
   status: JobApplicationStage;
 
-  @OneToMany(() => Feedback)
-  feedback: Feedback[];
+  // @OneToMany(() => Feedback)
+  // feedback: Feedback[];
 }
