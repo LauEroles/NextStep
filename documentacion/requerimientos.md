@@ -47,7 +47,8 @@
 #### Criterios de Aceptación
 - [ ] El sistema valida el email y contraseña contra la base de datos.
 - [ ] El sistema permite el acceso y redirige al dashboard correspondiente según el rol del usuario.
-- [ ] El sistema muestra un mensaje de error claro si las credenciales son incorrectas.
+- [ ] El servidor retorna el código HTTP `401 Unauthorized` y el sistema muestra un mensaje de error claro si las credenciales son incorrectas.
+- [ ] Las contraseñas nunca se transmiten ni almacenan en texto plano; se usa hashing con `bcrypt` (mínimo 10 rondas).
 
 #### Supuestos
 - **SA-001:** El usuario ya se encuentra registrado previamente en el sistema.
