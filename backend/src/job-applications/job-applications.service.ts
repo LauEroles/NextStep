@@ -24,14 +24,21 @@ export class JobApplicationsService {
     createJobApplicationDto: CreateJobApplicationDto,
     candidateId: number,
   ) {
+
     const candidate = await this.usersService.findOne(candidateId);
     if (!candidate) throw new NotFoundException('El candidato no existe.');
 
     const jobOffer = await this.jobOffersService.findOne(
       createJobApplicationDto.jobOffer_id,
     );
-    if (!jobOffer)
+
+    if (!jobOffer) {
       throw new NotFoundException('La oferta de trabajo no existe.');
+    }
+
+    if (!jobOffer.isActive) {
+      throw new BadRequestException('Esta oferta no se encuentra activa.');
+    }
 
     const existingApplication = await this.applicationRepo.findOne({
       where: { candidate_id: candidate.id, jobOffer_id: jobOffer.id },
