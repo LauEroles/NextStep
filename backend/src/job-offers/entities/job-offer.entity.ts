@@ -45,6 +45,9 @@ export class JobOffer {
   @Column()
   recruiter_id: number;
 
+  @Column()
+  isActive: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 
