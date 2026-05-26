@@ -6,6 +6,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { JobOffersModule } from './job-offers/job-offers.module';
 import { JobApplicationsModule } from './job-applications/job-applications.module';
+import { FeedbackModule } from './feedback/feedback.module';
 
 @Module({
   imports: [
@@ -27,6 +28,8 @@ import { JobApplicationsModule } from './job-applications/job-applications.modul
     }),
 
     UsersModule,
+
+    FeedbackModule,
     // JobOffersModule,
     // JobApplicationsModule,
   ],
