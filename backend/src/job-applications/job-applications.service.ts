@@ -24,7 +24,6 @@ export class JobApplicationsService {
     createJobApplicationDto: CreateJobApplicationDto,
     candidateId: number,
   ) {
-
     const candidate = await this.usersService.findOne(candidateId);
     if (!candidate) throw new NotFoundException('El candidato no existe.');
 
