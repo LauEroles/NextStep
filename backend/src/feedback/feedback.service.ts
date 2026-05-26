@@ -1,26 +1,43 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { UpdateFeedbackDto } from './dto/update-feedback.dto';
+import { Feedback } from './entities/feedback.entity';
 
 @Injectable()
 export class FeedbackService {
-  create(createFeedbackDto: CreateFeedbackDto) {
-    return 'This action adds a new feedback';
+  constructor(
+    @InjectRepository(Feedback)
+    private readonly feedbackRepository: Repository<Feedback>,
+  ) {}
+
+  async create(createFeedbackDto: CreateFeedbackDto) {
+    const feedback = this.feedbackRepository.create(createFeedbackDto);
+    return await this.feedbackRepository.save(feedback);
   }
 
-  findAll() {
-    return `This action returns all feedback`;
+  async findAll() {
+    return await this.feedbackRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} feedback`;
+  async findOne(id: number) {
+    const feedback = await this.feedbackRepository.findOneBy({ id });
+    if (!feedback) {
+      throw new NotFoundException(`El feedback con id #${id} no existe`);
+    }
+    return feedback;
   }
 
-  update(id: number, updateFeedbackDto: UpdateFeedbackDto) {
-    return `This action updates a #${id} feedback`;
+  async update(id: number, updateFeedbackDto: UpdateFeedbackDto) {
+    const feedback = await this.findOne(id);
+    const updated = Object.assign(feedback, updateFeedbackDto);
+    return await this.feedbackRepository.save(updated);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} feedback`;
+  async remove(id: number) {
+    const feedback = await this.findOne(id);
+    await this.feedbackRepository.remove(feedback);
+    return { message: `Feedback #${id} eliminado correctamente` };
   }
 }
