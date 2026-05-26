@@ -4,8 +4,8 @@ import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-// import { JobOffersModule } from './job-offers/job-offers.module';
-// import { JobApplicationsModule } from './job-applications/job-applications.module';
+import { JobOffersModule } from './job-offers/job-offers.module';
+import { JobApplicationsModule } from './job-applications/job-applications.module';
 
 @Module({
   imports: [
