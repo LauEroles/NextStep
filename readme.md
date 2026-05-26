@@ -6,11 +6,11 @@
 
 ## 2. Descripción Breve
 
-NextStep es una plataforma simple que mejora la experiencia de candidatos en procesos de selección.
+NextStep es una plataforma digital orientada a mejorar la experiencia de candidatos en procesos de selección.
 
-Permite que un recruiter publique una búsqueda laboral, reciba postulantes y cargue feedback estructurado para cada candidato.
+Permite que un reclutador publique una búsqueda laboral, reciba postulantes y cargue feedback estructurado para cada candidato.
 
-El candidato puede visualizar el estado de su postulación y recibir devoluciones útiles para seguir mejorando.
+El candidato puede visualizar el estado de su postulación y recibir devoluciones asociadas a su proceso de selección para poder tomar conciencia de los puntos de mejora en su proceso.
 
 ---
 
@@ -20,7 +20,7 @@ Muchas personas atraviesan procesos de selección sin respuesta o sin feedback.
 
 Esto genera:
 
-- Ghosting laboral  
+- Ausencia de comunicación o falta de respuesta por parte de la organización durante el proceso de selección 
 - Frustración  
 - Desmotivación  
 - Falta de guía para mejorar profesionalmente  
@@ -29,12 +29,12 @@ Esto genera:
 
 ## 4. Objetivo del MVP
 
-Crear una plataforma básica donde:
+Crear una plataforma que permita:
 
-- Recruiters crean Job Descriptions  
-- Candidatos se postulan  
-- Recruiters cargan feedback  
-- Candidatos visualizan resultados  
+- A los reclutadores crear Ofertas laborales  
+- A candidatos se postulan  
+- A reclutadores cargar feedbacks  
+- Visualización de resultados del proceso por parte de los candidatos
 
 ---
 
@@ -49,7 +49,7 @@ Puede:
 - Cargar feedback  
 - Cambiar estado de candidatos  
 
-### Applicant
+### Candidato
 
 Puede:
 
