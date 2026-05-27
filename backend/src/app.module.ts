@@ -7,6 +7,7 @@ import { AppService } from './app.service';
 import { JobOffersModule } from './job-offers/job-offers.module';
 import { JobApplicationsModule } from './job-applications/job-applications.module';
 import { FeedbackModule } from './feedback/feedback.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -30,8 +31,10 @@ import { FeedbackModule } from './feedback/feedback.module';
     UsersModule,
 
     FeedbackModule,
-    // JobOffersModule,
-    // JobApplicationsModule,
+
+    AuthModule,
+    JobOffersModule,
+    JobApplicationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
