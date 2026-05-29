@@ -1,76 +1,94 @@
-@startuml NextStep
+@startuml NextStep Class Diagram Entities Explicit
 
-class JobOffer{
-    -String title
-    -String descripcion
-    -number idRecruiter
-    -number idJobOffer
-    'list of skills with dropdown of skills
-    -String softSkills
-    'list of tech with dropdown of skills 
-    -String techSkills  
-    'dropdown 1-10???? Ver si usamos otro selector
-    -number score
-    -String seniority
-    -Date createDate
-    -Date closeDate
-    -boolean isActive
-
-    +getJobOfferDetails()
-    +setJobOfferDetails()
-
+class Role {
+  + id : number
+  + name : string
 }
 
-interface identifiable{
-    +generateId()
+class User {
+  + id : number
+  + email : string
+  - password : string
+  + firstName : string
+  + lastName : string
+  + isActive : boolean
+  + createdAt : Date
+  + updatedAt : Date
+  + role : Role
 }
 
-'todos deberian tener id solo que son son id diferentes 
-'se puede armar una interfaz o una abstracta que implemente la logica de generacion de id y que cada clase tenga su propio id con el mismo metodo de generacion
-abstract Class User{
-    -string name
-    -string surname
-    -string email
-    -string password
-    'number idUser consultar Ale?
-    
-    +getUserDetails()
-
-
+class Skill {
+  + id : number
+  + name : string
 }
 
-
-Class Applican extends User{
-    - number idApplicant
-
+class Seniority {
+  + id : number
+  + name : string
 }
 
-
-Class Recruiter extends User{
-
-    +createJobOffer()
-    +deleteJobOffer()
-    'disabile job offer instead of delete
-
+class JobOffer {
+  + id : number
+  + title : string
+  + description : string
+  + isActive : boolean
+  + createdAt : Date
+  + updatedAt : Date
+  + recruiter : User
+  + seniority : Seniority
+  + skills : Skill[]
 }
 
-
-
-Class Admin extends User{
-
+class Stage {
+  + id : number
+  + name : string
+  + sequenceOrder : number
 }
 
-
-class Feedback{
-    -number idFeedback
-    -number idApplicant
-    -number idRecruiter
-    -number idJobOffer
-    -String feedbackText
-
+class Application {
+  + id : number
+  + appliedAt : Date
+  + updatedAt : Date
+  + applicant : User
+  + jobOffer : JobOffer
+  + currentStage : Stage
+  + feedbacks : Feedback[]
 }
 
-'Relationships
+class Feedback {
+  + id : number
+  + technicalScore : number | null
+  + softSkillsScore : number | null
+  + comment : string
+  + createdAt : Date
+  + application : Application
+  + stage : Stage
+}
 
+class AuditLog {
+  + id : number
+  + action : string
+  + tableName : string
+  + recordId : string
+  + metadata : any
+  + createdAt : Date
+  + user : User
+}
+
+' Flechas visuales para conectar el mapa
+User "many" --> "1" Role
+JobOffer "many" --> "1" User
+JobOffer "many" --> "1" Seniority
+JobOffer "many" --> "many" Skill
+
+Application "many" --> "1" User
+Application "many" --> "1" JobOffer
+Application "many" --> "1" Stage
+
+Application "1" *-- "many" Feedback
+Feedback "many" --> "1" Stage
+Feedback "many" --> "1" User
+
+AuditLog "many" --> "1" User
 
 @enduml
