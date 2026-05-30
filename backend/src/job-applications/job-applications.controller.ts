@@ -6,11 +6,24 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { JobApplicationsService } from './job-applications.service';
 import { CreateJobApplicationDto } from './dto/create-job-application.dto';
 import { UpdateJobApplicationDto } from './dto/update-job-application.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
+interface RequestWithUser extends Request {
+  user: {
+    id: number;
+    email: string;
+    role: string;
+  };
+}
+
+@UseGuards(JwtAuthGuard)
 @Controller('job-applications')
 export class JobApplicationsController {
   constructor(
@@ -18,8 +31,15 @@ export class JobApplicationsController {
   ) {}
 
   @Post()
-  create(@Body() createJobApplicationDto: CreateJobApplicationDto) {
-    return this.jobApplicationsService.create(createJobApplicationDto);
+  create(
+    @Body() createJobApplicationDto: CreateJobApplicationDto,
+    @Req() req: RequestWithUser,
+  ) {
+    const candidateId = req.user.id;
+    return this.jobApplicationsService.create(
+      createJobApplicationDto,
+      candidateId,
+    );
   }
 
   @Get()

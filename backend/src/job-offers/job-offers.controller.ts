@@ -1,8 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { JobOffersService } from './job-offers.service';
 import { CreateJobOfferDto } from './dto/create-job-offer.dto';
 import { UpdateJobOfferDto } from './dto/update-job-offer.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('job-offers')
 export class JobOffersController {
   constructor(private readonly jobOffersService: JobOffersService) {}
@@ -23,7 +34,10 @@ export class JobOffersController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateJobOfferDto: UpdateJobOfferDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateJobOfferDto: UpdateJobOfferDto,
+  ) {
     return this.jobOffersService.update(+id, updateJobOfferDto);
   }
 
