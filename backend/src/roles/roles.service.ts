@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateRoleDto } from './dto/create-role.dto';
@@ -61,5 +61,15 @@ export class RolesService {
     const role = await this.findOne(id);
     await this.roleRepository.remove(role);
     return { message: `Rol #${id} eliminado correctamente` };
+  }
+
+  async findDefaultRole() {
+    const role = await this.roleRepository.findOneBy({ isDefault: true });
+    
+    if (!role) {
+      throw new InternalServerErrorException('Error crítico: No hay un rol por defecto configurado en el sistema');
+    }
+    
+    return role;
   }
 }

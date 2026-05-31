@@ -6,16 +6,18 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { RolesService } from '../roles/roles.service';
+import { Role } from '../roles/entities/role.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly rolesService: RolesService,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -25,16 +27,24 @@ export class UsersService {
       throw new ConflictException('El correo electrónico ya está registrado');
     }
 
+    let userRole: Role;
+    if (createUserDto.role) {
+      userRole = await this.rolesService.findByName(createUserDto.role);
+    } else {
+      userRole = await this.rolesService.findDefaultRole();
+    }
+    
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
     const newUser = this.userRepository.create({
       ...createUserDto,
       password: hashedPassword,
+      role: userRole,
     });
 
     await this.userRepository.save(newUser);
 
-    const { password, ...result } = newUser;
+    const { password: _, ...result } = newUser;
     return result;
   }
 
@@ -59,6 +69,7 @@ export class UsersService {
       return await this.userRepository
         .createQueryBuilder('user')
         .addSelect('user.password')
+        .leftJoinAndSelect('user.role', 'role')
         .where('user.email = :email', { email: emailLowerCase })
         .getOne();
     }
@@ -73,7 +84,7 @@ export class UsersService {
       updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
     }
 
-    const updatedUser = Object.assign(user, updateUserDto);
+    const updatedUser = this.userRepository.merge(user, updateUserDto);
 
     return await this.userRepository.save(updatedUser);
   }

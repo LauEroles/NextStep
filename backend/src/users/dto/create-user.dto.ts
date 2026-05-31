@@ -4,10 +4,8 @@ import {
   IsNotEmpty,
   MinLength,
   MaxLength,
-  IsEnum,
   IsOptional,
 } from 'class-validator';
-import { UserRole } from '../enums/user-role.enum';
 
 export class CreateUserDto {
   @IsString({ message: 'El nombre debe ser un texto válido' })
@@ -25,7 +23,7 @@ export class CreateUserDto {
   @MaxLength(50, { message: 'La contraseña es demasiado larga' })
   password: string;
 
-  @IsEnum(UserRole, { message: 'El rol especificado no es válido' })
+  @IsString({ message: 'El rol debe ser un texto' })
   @IsOptional()
-  role?: UserRole;
+  role?: string;
 }

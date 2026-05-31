@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { Role } from '../../roles/entities/role.entity';
 
@@ -22,7 +23,8 @@ export class User {
   @Column({ select: false })
   password: string;
 
-  @ManyToOne(() => Role, (role) => role.users, { eager: true }) 
+  @ManyToOne(() => Role, (role) => role.users, { eager: true })
+  @JoinColumn({ name: 'role_id' })
   role: Role;
 
   @CreateDateColumn()
