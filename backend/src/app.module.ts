@@ -8,6 +8,7 @@ import { JobOffersModule } from './job-offers/job-offers.module';
 import { JobApplicationsModule } from './job-applications/job-applications.module';
 import { FeedbackModule } from './feedback/feedback.module';
 import { AuthModule } from './auth/auth.module';
+import { RolesModule } from './roles/roles.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { AuthModule } from './auth/auth.module';
     AuthModule,
     JobOffersModule,
     JobApplicationsModule,
+    RolesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
