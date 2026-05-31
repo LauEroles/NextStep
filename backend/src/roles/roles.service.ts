@@ -47,22 +47,6 @@ export class RolesService {
     return role;
   }
 
-  async update(id: number, updateRoleDto: UpdateRoleDto) {
-    const role = await this.findOne(id);
-
-    if (updateRoleDto.name) {
-      role.name = updateRoleDto.name.toLowerCase();
-    }
-
-    return await this.roleRepository.save(role);
-  }
-
-  async remove(id: number) {
-    const role = await this.findOne(id);
-    await this.roleRepository.remove(role);
-    return { message: `Rol #${id} eliminado correctamente` };
-  }
-
   async findDefaultRole() {
     const role = await this.roleRepository.findOneBy({ isDefault: true });
     
