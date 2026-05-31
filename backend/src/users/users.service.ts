@@ -19,9 +19,8 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    const userExists = await this.userRepository.findOneBy({
-      email: createUserDto.email,
-    });
+    const userExists = await this.findByEmail(createUserDto.email);
+    
     if (userExists) {
       throw new ConflictException('El correo electrónico ya está registrado');
     }
@@ -35,7 +34,6 @@ export class UsersService {
 
     await this.userRepository.save(newUser);
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...result } = newUser;
     return result;
   }
@@ -52,6 +50,20 @@ export class UsersService {
     }
 
     return user;
+  }
+
+  async findByEmail(email: string, includePassword = false) {
+    const emailLowerCase = email.toLowerCase();
+
+    if (includePassword) {
+      return await this.userRepository
+        .createQueryBuilder('user')
+        .addSelect('user.password')
+        .where('user.email = :email', { email: emailLowerCase })
+        .getOne();
+    }
+
+    return await this.userRepository.findOneBy({ email: emailLowerCase });
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
