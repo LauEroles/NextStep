@@ -9,6 +9,7 @@ import { JobApplicationsModule } from './job-applications/job-applications.modul
 import { FeedbackModule } from './feedback/feedback.module';
 import { AuthModule } from './auth/auth.module';
 import { RolesModule } from './roles/roles.module';
+import { StagesModule } from './stages/stages.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { RolesModule } from './roles/roles.module';
     JobOffersModule,
     JobApplicationsModule,
     RolesModule,
+    StagesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
