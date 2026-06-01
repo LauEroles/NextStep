@@ -5,7 +5,7 @@ export class Stage {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 100 })
+  @Column({ type: 'varchar', length: 100, unique: true })
   name: string;
 
   @Column({ name: 'sequence_order', type: 'int', unique: true })

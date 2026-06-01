@@ -1,26 +1,64 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateStageDto } from './dto/create-stage.dto';
 import { UpdateStageDto } from './dto/update-stage.dto';
+import { Stage } from './entities/stage.entity';
 
 @Injectable()
 export class StagesService {
-  create(createStageDto: CreateStageDto) {
-    return 'This action adds a new stage';
+  constructor(
+    @InjectRepository(Stage)
+    private readonly stageRepo: Repository<Stage>,
+  ) {}
+
+  async create(createStageDto: CreateStageDto) {
+    const stage = this.stageRepo.create({
+      name: createStageDto.name,
+      sequenceOrder: createStageDto.sequence_order,
+    });
+    return await this.stageRepo.save(stage);
   }
 
-  findAll() {
-    return `This action returns all stages`;
+  async findAll() {
+    return await this.stageRepo.find({
+      order: { sequenceOrder: 'ASC' },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} stage`;
+  async findOne(id: number) {
+    const stage = await this.stageRepo.findOne({ where: { id } });
+    if (!stage) {
+      throw new NotFoundException(`No se encontró ninguna etapa con el ID #${id}.`);
+    }
+    return stage;
   }
 
-  update(id: number, updateStageDto: UpdateStageDto) {
-    return `This action updates a #${id} stage`;
+  async findOneById(id: number) {
+    return await this.findOne(id);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} stage`;
+  async findInitialStage() {
+    const stage = await this.stageRepo.findOne({
+      where: { sequenceOrder: 10 },
+    });
+    if (!stage) {
+      throw new NotFoundException('Error del sistema: No hay una etapa inicial configurada con orden 10.');
+    }
+    return stage;
+  }
+
+  async update(id: number, updateStageDto: UpdateStageDto) {
+    const stage = await this.findOne(id);
+    
+    if (updateStageDto.name) stage.name = updateStageDto.name;
+    if (updateStageDto.sequence_order) stage.sequenceOrder = updateStageDto.sequence_order;
+
+    return await this.stageRepo.save(stage);
+  }
+
+  async remove(id: number) {
+    const stage = await this.findOne(id);
+    return await this.stageRepo.remove(stage);
   }
 }
