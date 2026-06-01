@@ -18,25 +18,19 @@ export class Feedback {
   @JoinColumn({ name: 'application_id' })
   application: JobApplication;
 
-  @Column()
-  application_id: number;
-
   @ManyToOne(() => User)
   @JoinColumn({ name: 'recruiter_id' })
   recruiter: User;
 
-  @Column()
-  recruiter_id: number;
-
-  @Column({ type: 'int' })
+  @Column({ type: 'int', nullable: true })
   technical_score: number;
 
-  @Column({ type: 'int' })
+  @Column({ type: 'int', nullable: true })
   soft_skills_score: number;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text' })
   comment: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 }
