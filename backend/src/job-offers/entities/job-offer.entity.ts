@@ -27,9 +27,6 @@ export class JobOffer {
   })
   seniority: Seniority;
 
-  @Column({ type: 'varchar', length: 500 })
-  skills_required: string;
-
   @ManyToOne(() => User)
   @JoinColumn({ name: 'recruiter_id' })
   recruiter: User;
