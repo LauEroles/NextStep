@@ -1,12 +1,12 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
-  //OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
-import { JobApplicationStage } from '../enums/job-application-stage.enum';
 import { JobOffer } from '../../job-offers/entities/job-offer.entity';
 import { User } from '../../users/entities/user.entity';
 
@@ -19,23 +19,17 @@ export class JobApplication {
   @JoinColumn({ name: 'jobOffer_id' })
   jobOffer: JobOffer;
 
-  @Column()
-  jobOffer_id: number;
-
   @ManyToOne(() => User)
-  @JoinColumn({ name: 'candidate_id' })
-  candidate: User;
+  @JoinColumn({ name: 'applicant_id' })
+  applicant: User;
 
-  @Column()
-  candidate_id: number;
+  @ManyToOne(() => Stage)
+  @JoinColumn({ name: 'current_stage_id' })
+  currentStage: Stage;
 
-  @Column({
-    type: 'enum',
-    enum: JobApplicationStage,
-    default: JobApplicationStage.APPLIED,
-  })
-  status: JobApplicationStage;
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
 
-  // @OneToMany(() => Feedback)
-  // feedback: Feedback[];
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
 }
