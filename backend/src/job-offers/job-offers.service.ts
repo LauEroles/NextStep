@@ -12,8 +12,8 @@ export class JobOffersService {
     private readonly jobOfferRepository: Repository<JobOffer>,
   ) {}
 
-  async create(createJobOfferDto: CreateJobOfferDto) {
-    const jobOffer = this.jobOfferRepository.create(createJobOfferDto);
+  async create(createJobOfferDto: CreateJobOfferDto, recruiterId: number) {
+    const jobOffer = this.jobOfferRepository.create({ ...createJobOfferDto, recruiter: { id: recruiterId } });
     return await this.jobOfferRepository.save(jobOffer);
   }
 
