@@ -25,7 +25,7 @@ export class JobApplicationsService {
     applicantId: number,
   ) {
     const jobOffer = await this.jobOffersService.findOne(
-      createJobApplicationDto.jobOffer_id,
+      createJobApplicationDto.job_offer_id,
     );
 
     if (!jobOffer) {
@@ -80,7 +80,7 @@ export class JobApplicationsService {
   async update(id: number, updateJobApplicationDto: UpdateJobApplicationDto) {
     const application = await this.findOne(id);
 
-    const targetStage = await this.stagesService.findOneById(
+    const targetStage = await this.stagesService.findOne(
       updateJobApplicationDto.current_stage_id,
     );
 

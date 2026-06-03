@@ -28,7 +28,7 @@ export class JobApplicationsController {
   @Post()
   create(
     @Body() createJobApplicationDto: CreateJobApplicationDto,
-    @CurrentUser() currentUser: ActiveUser
+    @CurrentUser() currentUser: ActiveUser,
   ) {
     return this.jobApplicationsService.create(
       createJobApplicationDto,

@@ -16,7 +16,7 @@ export class JobApplication {
   id: number;
 
   @ManyToOne(() => JobOffer)
-  @JoinColumn({ name: 'jobOffer_id' })
+  @JoinColumn({ name: 'job_offer_id' })
   jobOffer: JobOffer;
 
   @ManyToOne(() => User)

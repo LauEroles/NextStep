@@ -29,30 +29,28 @@ export class StagesService {
   async findOne(id: number) {
     const stage = await this.stageRepo.findOne({ where: { id } });
     if (!stage) {
-      throw new NotFoundException(`No se encontró ninguna etapa con el ID #${id}.`);
+      throw new NotFoundException(`No se encontró ninguna etapa.`);
     }
     return stage;
-  }
-
-  async findOneById(id: number) {
-    return await this.findOne(id);
   }
 
   async findInitialStage() {
-    const stage = await this.stageRepo.findOne({
-      where: { sequenceOrder: 10 },
+    const initialStage = await this.stageRepo.findOne({
+      where: {},
+      order: { sequenceOrder: 'ASC' },
     });
-    if (!stage) {
-      throw new NotFoundException('Error del sistema: No hay una etapa inicial configurada con orden 10.');
+    if (!initialStage) {
+      throw new NotFoundException('No se encontraron etapas.');
     }
-    return stage;
+    return initialStage;
   }
 
   async update(id: number, updateStageDto: UpdateStageDto) {
     const stage = await this.findOne(id);
-    
+
     if (updateStageDto.name) stage.name = updateStageDto.name;
-    if (updateStageDto.sequence_order) stage.sequenceOrder = updateStageDto.sequence_order;
+    if (updateStageDto.sequence_order)
+      stage.sequenceOrder = updateStageDto.sequence_order;
 
     return await this.stageRepo.save(stage);
   }
