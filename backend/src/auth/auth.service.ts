@@ -16,13 +16,17 @@ export class AuthService {
 
     if (!user) throw new UnauthorizedException('Credenciales inválidas');
 
-    const passwordMatch = await bcrypt.compare(password, user.password);
+    const passMatch = await bcrypt.compare(password, user.password);
 
-    if (!passwordMatch) throw new UnauthorizedException('Credenciales inválidas');
+    if (!passMatch) throw new UnauthorizedException('Credenciales inválidas');
 
     const { password: _, ...result } = user;
 
-    const payload: ActiveUser = { id: user.id, email: user.email, role: user.role.name };
+    const payload: ActiveUser = {
+      id: user.id,
+      email: user.email,
+      role: user.role.name,
+    };
 
     const token = await this.jwtService.signAsync(payload);
 

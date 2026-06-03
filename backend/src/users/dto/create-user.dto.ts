@@ -5,6 +5,7 @@ import {
   MinLength,
   MaxLength,
   IsOptional,
+  IsNumber,
 } from 'class-validator';
 
 export class CreateUserDto {
@@ -23,7 +24,7 @@ export class CreateUserDto {
   @MaxLength(50, { message: 'La contraseña es demasiado larga' })
   password: string;
 
-  @IsString({ message: 'El rol debe ser un texto' })
+  @IsNumber({}, { message: 'El ID del rol debe ser un número' })
   @IsOptional()
-  role?: string;
+  role_id?: number;
 }

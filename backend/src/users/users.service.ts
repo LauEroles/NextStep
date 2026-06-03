@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -22,18 +23,24 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto) {
     const userExists = await this.findByEmail(createUserDto.email);
-    
+
     if (userExists) {
       throw new ConflictException('El correo electrónico ya está registrado');
     }
 
     let userRole: Role;
-    if (createUserDto.role) {
-      userRole = await this.rolesService.findByName(createUserDto.role);
+    if (createUserDto.role_id) {
+      userRole = await this.rolesService.findOne(createUserDto.role_id);
+
+      if (userRole.name === 'admin') {
+        throw new ForbiddenException(
+          'No tienes permisos para crear una cuenta de administrador.',
+        );
+      }
     } else {
       userRole = await this.rolesService.findDefaultRole();
     }
-    
+
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
     const newUser = this.userRepository.create({
