@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { JobApplication } from '../../job-applications/entities/job-application.entity';
+import { Stage } from '../../stages/entities/stage.entity';
 
 @Entity('feedback')
 export class Feedback {
@@ -21,6 +22,10 @@ export class Feedback {
   @ManyToOne(() => User)
   @JoinColumn({ name: 'recruiter_id' })
   recruiter: User;
+
+  @ManyToOne(() => Stage)
+  @JoinColumn({ name: 'stage_id' })
+  stage: Stage;
 
   @Column({ type: 'int', nullable: true })
   technical_score: number;
