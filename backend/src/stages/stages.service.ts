@@ -16,6 +16,7 @@ export class StagesService {
     const stage = this.stageRepo.create({
       name: createStageDto.name,
       sequenceOrder: createStageDto.sequence_order,
+      isTerminal: createStageDto.is_terminal,
     });
     return await this.stageRepo.save(stage);
   }

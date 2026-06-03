@@ -40,7 +40,8 @@ entity "stages" as stages {
   * id : number <<PK>>
   --
   * name : VARCHAR(100) <<UNIQUE>>
-  * sequence_order : INT <<UNIQUE>> 
+  * sequence_order : INT <<UNIQUE>>
+  * is_terminal : BOOLEAN
 }
 
 entity "applications" as applications {

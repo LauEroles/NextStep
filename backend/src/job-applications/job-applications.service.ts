@@ -84,6 +84,12 @@ export class JobApplicationsService {
       updateJobApplicationDto.current_stage_id,
     );
 
+    if (application.currentStage.isTerminal) {
+      throw new BadRequestException(
+        'No se puede cambiar la etapa de una postulación que ya ha finalizado.',
+      );
+    }
+
     application.currentStage = targetStage;
     return await this.applicationRepo.save(application);
   }

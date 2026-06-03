@@ -10,4 +10,7 @@ export class Stage {
 
   @Column({ name: 'sequence_order', type: 'int', unique: true })
   sequenceOrder: number;
+
+  @Column({ type: 'boolean', default: false, name: 'is_terminal' })
+  isTerminal: boolean;
 }
