@@ -5,7 +5,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -44,7 +44,9 @@ export class UsersService {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
     const newUser = this.userRepository.create({
-      ...createUserDto,
+      firstName: createUserDto.first_name,
+      lastName: createUserDto.last_name,
+      email: createUserDto.email,
       password: hashedPassword,
       role: userRole,
     });
@@ -61,17 +63,23 @@ export class UsersService {
 
   async findOne(id: number) {
     const user = await this.userRepository.findOneBy({ id });
-
     if (!user) {
       throw new NotFoundException(`El usuario con el id #${id} no existe`);
     }
-
     return user;
+  }
+
+  async searchByName(searchTerm: string) {
+    return await this.userRepository.find({
+      where: [
+        { firstName: ILike(`%${searchTerm}%`) },
+        { lastName: ILike(`%${searchTerm}%`) },
+      ],
+    });
   }
 
   async findByEmail(email: string, includePassword = false) {
     const emailLowerCase = email.toLowerCase();
-
     if (includePassword) {
       return await this.userRepository
         .createQueryBuilder('user')
@@ -80,27 +88,21 @@ export class UsersService {
         .where('user.email = :email', { email: emailLowerCase })
         .getOne();
     }
-
     return await this.userRepository.findOneBy({ email: emailLowerCase });
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     const user = await this.findOne(id);
-
     if (updateUserDto.password) {
       updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
     }
-
     const updatedUser = this.userRepository.merge(user, updateUserDto);
-
     return await this.userRepository.save(updatedUser);
   }
 
   async remove(id: number) {
     const user = await this.findOne(id);
-
     await this.userRepository.remove(user);
-
     return { message: `Usuario #${id} eliminado correctamente` };
   }
 }
