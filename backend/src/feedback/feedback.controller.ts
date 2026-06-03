@@ -14,6 +14,8 @@ import { UpdateFeedbackDto } from './dto/update-feedback.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import type { ActiveUser } from '../auth/interfaces/active-user.interface';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('feedback')
@@ -22,8 +24,11 @@ export class FeedbackController {
 
   @Roles('recruiter')
   @Post()
-  create(@Body() createFeedbackDto: CreateFeedbackDto) {
-    return this.feedbackService.create(createFeedbackDto);
+  create(
+    @Body() createFeedbackDto: CreateFeedbackDto,
+    @CurrentUser() currentUser: ActiveUser,
+  ) {
+    return this.feedbackService.create(createFeedbackDto, currentUser.id);
   }
 
   @Roles('admin')

@@ -2,5 +2,5 @@ import { PartialType, OmitType } from '@nestjs/mapped-types';
 import { CreateFeedbackDto } from './create-feedback.dto';
 
 export class UpdateFeedbackDto extends PartialType(
-  OmitType(CreateFeedbackDto, ['application_id'] as const)
+  OmitType(CreateFeedbackDto, ['application_id', 'stage_id'] as const),
 ) {}

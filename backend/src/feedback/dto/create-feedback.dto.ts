@@ -5,12 +5,17 @@ import {
   IsOptional,
   Min,
   Max,
+  IsNumber,
 } from 'class-validator';
 
 export class CreateFeedbackDto {
   @IsInt({ message: 'El application_id debe ser un número entero' })
   @IsNotEmpty({ message: 'El application_id es obligatorio' })
   application_id: number;
+
+  @IsNumber({}, { message: 'El ID de la etapa debe ser un número válido' })
+  @IsNotEmpty({ message: 'El ID de la etapa es obligatorio' })
+  stage_id: number;
 
   @IsInt({ message: 'El puntaje técnico debe ser un número entero' })
   @IsOptional()
