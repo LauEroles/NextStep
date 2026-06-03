@@ -1,5 +1,4 @@
 import {
-  Column,
   CreateDateColumn,
   Entity,
   JoinColumn,
@@ -9,6 +8,7 @@ import {
 } from 'typeorm';
 import { JobOffer } from '../../job-offers/entities/job-offer.entity';
 import { User } from '../../users/entities/user.entity';
+import { Stage } from '../../stages/entities/stage.entity';
 
 @Entity('job_applications')
 export class JobApplication {

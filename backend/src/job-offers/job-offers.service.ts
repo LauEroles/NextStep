@@ -13,7 +13,10 @@ export class JobOffersService {
   ) {}
 
   async create(createJobOfferDto: CreateJobOfferDto, recruiterId: number) {
-    const jobOffer = this.jobOfferRepository.create({ ...createJobOfferDto, recruiter: { id: recruiterId } });
+    const jobOffer = this.jobOfferRepository.create({
+      ...createJobOfferDto,
+      recruiter: { id: recruiterId },
+    });
     return await this.jobOfferRepository.save(jobOffer);
   }
 

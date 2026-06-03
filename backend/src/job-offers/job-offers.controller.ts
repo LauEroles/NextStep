@@ -24,7 +24,10 @@ export class JobOffersController {
 
   @Roles('recruiter')
   @Post()
-  create(@Body() createJobOfferDto: CreateJobOfferDto, @CurrentUser() currentUser: ActiveUser) {
+  create(
+    @Body() createJobOfferDto: CreateJobOfferDto,
+    @CurrentUser() currentUser: ActiveUser,
+  ) {
     return this.jobOffersService.create(createJobOfferDto, currentUser.id);
   }
 

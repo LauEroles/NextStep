@@ -31,7 +31,7 @@ export class JobOffer {
   @JoinColumn({ name: 'recruiter_id' })
   recruiter: User;
 
-  @Column()
+  @Column({ type: 'boolean', default: true })
   isActive: boolean;
 
   @CreateDateColumn()
