@@ -9,7 +9,6 @@ import {
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Seniority } from '../enums/seniority.enum';
-import { JobOfferStatus } from '../enums/job-offers.enum';
 
 @Entity('job_offers')
 export class JobOffer {
@@ -28,24 +27,11 @@ export class JobOffer {
   })
   seniority: Seniority;
 
-  @Column({ type: 'varchar', length: 500 })
-  skills_required: string;
-
-  @Column({
-    type: 'enum',
-    enum: JobOfferStatus,
-    default: JobOfferStatus.ACTIVE,
-  })
-  status: JobOfferStatus;
-
   @ManyToOne(() => User)
   @JoinColumn({ name: 'recruiter_id' })
   recruiter: User;
 
-  @Column()
-  recruiter_id: number;
-
-  @Column()
+  @Column({ type: 'boolean', default: true })
   isActive: boolean;
 
   @CreateDateColumn()

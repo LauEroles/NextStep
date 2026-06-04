@@ -12,27 +12,38 @@ import { FeedbackService } from './feedback.service';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { UpdateFeedbackDto } from './dto/update-feedback.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import type { ActiveUser } from '../auth/interfaces/active-user.interface';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('feedback')
 export class FeedbackController {
   constructor(private readonly feedbackService: FeedbackService) {}
 
+  @Roles('recruiter')
   @Post()
-  create(@Body() createFeedbackDto: CreateFeedbackDto) {
-    return this.feedbackService.create(createFeedbackDto);
+  create(
+    @Body() createFeedbackDto: CreateFeedbackDto,
+    @CurrentUser() currentUser: ActiveUser,
+  ) {
+    return this.feedbackService.create(createFeedbackDto, currentUser.id);
   }
 
+  @Roles('admin')
   @Get()
   findAll() {
     return this.feedbackService.findAll();
   }
 
+  @Roles('admin', 'recruiter', 'applicant')
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.feedbackService.findOne(+id);
   }
 
+  @Roles('recruiter')
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -41,6 +52,7 @@ export class FeedbackController {
     return this.feedbackService.update(+id, updateFeedbackDto);
   }
 
+  @Roles('admin', 'recruiter')
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.feedbackService.remove(+id);

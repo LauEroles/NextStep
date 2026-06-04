@@ -1,10 +1,7 @@
-import { IsEnum, IsOptional } from 'class-validator';
-import { JobApplicationStage } from '../enums/job-application-stage.enum';
+import { IsNumber, IsNotEmpty } from 'class-validator';
 
 export class UpdateJobApplicationDto {
-  @IsOptional()
-  @IsEnum(JobApplicationStage, {
-    message: 'El estado ingresado no es una etapa válida del proceso.',
-  })
-  status?: JobApplicationStage;
+  @IsNotEmpty({ message: 'El ID de la nueva etapa es obligatorio.' })
+  @IsNumber({}, { message: 'El ID de la etapa debe ser un número válido.' })
+  current_stage_id: number;
 }

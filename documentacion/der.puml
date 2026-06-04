@@ -18,12 +18,6 @@ entity "roles" as roles {
   * name : VARCHAR(50) <<UNIQUE>>
 }
 
-entity "skills" as skills {
-  * id : number <<PK>>
-  --
-  * name : VARCHAR(100) <<UNIQUE>>
-}
-
 entity "seniorities" as seniorities {
   * id : number <<PK>>
   --
@@ -42,18 +36,12 @@ entity "job_offers" as job_offers {
   updated_at : TIMESTAMP
 }
 
-entity "job_offer_skills" as job_offer_skills {
-  * job_offer_id : number <<FK>>
-  * skill_id : number <<FK>>
-  --
-  <<PK>> (job_offer_id, skill_id)
-}
-
 entity "stages" as stages {
   * id : number <<PK>>
   --
-  * name : VARCHAR(100)
-  * sequence_order : INT <<UNIQUE>> 
+  * name : VARCHAR(100) <<UNIQUE>>
+  * sequence_order : INT <<UNIQUE>>
+  * is_terminal : BOOLEAN
 }
 
 entity "applications" as applications {
@@ -81,7 +69,7 @@ entity "feedbacks" as feedbacks {
 entity "audit_logs" as audit_logs {
   * id : number <<PK>>
   --
-  * user_id : number <<FK>>
+  user_email : number <<FK>>
   * action : VARCHAR(100)
   * table_name : VARCHAR(100)
   record_id : VARCHAR(255)
