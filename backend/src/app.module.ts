@@ -24,8 +24,8 @@ import { AuthModule } from './auth/auth.module';
         ssl: { rejectUnauthorized: false },
       },
 
-      autoLoadEntities: true,
-      synchronize: true,
+      autoLoadEntities: false,
+      synchronize: false,
     }),
 
     UsersModule,
