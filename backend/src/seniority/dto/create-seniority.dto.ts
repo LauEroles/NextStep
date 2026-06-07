@@ -1,6 +1,4 @@
-import { IsNotEmpty } from "class-validator/types/decorator/common/IsNotEmpty";
-import { MaxLength } from "class-validator/types/decorator/string/MaxLength";
-import { IsString } from "class-validator/types/decorator/typechecker/IsString";
+import { IsNotEmpty, MaxLength, IsString } from 'class-validator';
 
 export class CreateSeniorityDto {
     @IsString({ message: 'El nombre de la seniority debe ser una cadena de texto' })
