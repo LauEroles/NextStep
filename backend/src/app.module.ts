@@ -10,6 +10,7 @@ import { FeedbackModule } from './feedback/feedback.module';
 import { AuthModule } from './auth/auth.module';
 import { RolesModule } from './roles/roles.module';
 import { StagesModule } from './stages/stages.module';
+import { SeniorityModule } from './seniority/seniority.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { StagesModule } from './stages/stages.module';
     JobApplicationsModule,
     RolesModule,
     StagesModule,
+    SeniorityModule,
   ],
   controllers: [AppController],
   providers: [AppService],
