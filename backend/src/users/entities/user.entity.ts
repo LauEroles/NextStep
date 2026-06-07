@@ -23,7 +23,7 @@ export class User {
   @Column({ type: 'varchar', length: 50, unique: true })
   email: string;
 
-  @Column({ type: 'varchar', length: 50, select: false })
+  @Column({ type: 'varchar', length: 255, select: false })
   password: string;
 
   @ManyToOne(() => Role, (role) => role.users, { eager: true })
