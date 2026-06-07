@@ -8,6 +8,11 @@ import {
   IsNumber,
 } from 'class-validator';
 
+export enum UserRolesName{
+  APPLICANT = 'applicant',
+  RECRUITER = 'recruiter'
+}
+
 export class CreateUserDto {
   @IsString({ message: 'El nombre debe ser un texto válido' })
   @IsNotEmpty({ message: 'El nombre es obligatorio' })
