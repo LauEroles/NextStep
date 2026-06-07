@@ -9,6 +9,8 @@ import { JobApplicationsModule } from './job-applications/job-applications.modul
 import { FeedbackModule } from './feedback/feedback.module';
 import { AuthModule } from './auth/auth.module';
 import { AuditLogsModule } from './audit-logs/audit-logs.module';
+import { RolesModule } from './roles/roles.module';
+import { StagesModule } from './stages/stages.module';
 
 @Module({
   imports: [
@@ -38,6 +40,8 @@ import { AuditLogsModule } from './audit-logs/audit-logs.module';
     JobApplicationsModule,
 
     AuditLogsModule,
+    RolesModule,
+    StagesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
