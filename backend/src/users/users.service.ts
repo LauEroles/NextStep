@@ -31,7 +31,6 @@ export class UsersService {
     let userRole: Role;
     if (createUserDto.role_name) {
       userRole = await this.rolesService.findByName(createUserDto.role_name);
-
   
     } else {
       userRole = await this.rolesService.findDefaultRole();
