@@ -11,36 +11,32 @@ import { AuthModule } from './auth/auth.module';
 import { RolesModule } from './roles/roles.module';
 import { StagesModule } from './stages/stages.module';
 import { SeniorityModule } from './seniority/seniority.module';
+import { AuditLogsModule } from './audit-logs/audit-logs.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-
     TypeOrmModule.forRoot({
       type: 'postgres',
       url: process.env.DATABASE_URL,
-
       ssl: true,
       extra: {
         ssl: { rejectUnauthorized: false },
       },
-
       autoLoadEntities: true,
       synchronize: true,
     }),
-
     UsersModule,
-
     FeedbackModule,
-
     AuthModule,
     JobOffersModule,
     JobApplicationsModule,
     RolesModule,
     StagesModule,
     SeniorityModule,
+    AuditLogsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
