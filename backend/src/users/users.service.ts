@@ -29,14 +29,10 @@ export class UsersService {
     }
 
     let userRole: Role;
-    if (createUserDto.role_id) {
-      userRole = await this.rolesService.findOne(createUserDto.role_id);
+    if (createUserDto.role_name) {
+      userRole = await this.rolesService.findByName(createUserDto.role_name);
 
-      if (userRole.name === 'admin') {
-        throw new ForbiddenException(
-          'No tienes permisos para crear una cuenta de administrador.',
-        );
-      }
+  
     } else {
       userRole = await this.rolesService.findDefaultRole();
     }

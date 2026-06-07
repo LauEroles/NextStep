@@ -5,10 +5,10 @@ import {
   MinLength,
   MaxLength,
   IsOptional,
-  IsNumber,
+  IsEnum,
 } from 'class-validator';
 
-export enum UserRolesName{
+export enum UserRoleName{
   APPLICANT = 'applicant',
   RECRUITER = 'recruiter'
 }
@@ -32,7 +32,7 @@ export class CreateUserDto {
   @MaxLength(50, { message: 'La contraseña es demasiado larga' })
   password: string;
 
-  @IsNumber({}, { message: 'El ID del rol debe ser un número' })
+  @IsEnum(UserRoleName, { message: 'El nombre del rol debe ser uno de los valores válidos' })
   @IsOptional()
-  role_id?: number;
+  role_name?: string;
 }
