@@ -21,4 +21,10 @@ export class AuthController {
   register(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
+
+  @Post('google-login')
+  @HttpCode(HttpStatus.OK)
+  googleLogin(@Body() body: { email: string }) {
+    return this.authService.googleSignIn(body.email);
+  }
 }
