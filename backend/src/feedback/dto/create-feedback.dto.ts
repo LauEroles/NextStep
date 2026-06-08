@@ -6,6 +6,7 @@ import {
   Min,
   Max,
   IsNumber,
+  MaxLength,
 } from 'class-validator';
 
 export class CreateFeedbackDto {
@@ -19,17 +20,18 @@ export class CreateFeedbackDto {
 
   @IsInt({ message: 'El puntaje técnico debe ser un número entero' })
   @IsOptional()
-  @Min(1, { message: 'El puntaje mínimo es 1' })
-  @Max(10, { message: 'El puntaje máximo es 10' })
+  @Min(0, { message: 'El puntaje mínimo es 0' })
+  @Max(5, { message: 'El puntaje máximo es 5' })
   technical_score?: number;
 
   @IsInt({ message: 'El puntaje soft skills debe ser un número entero' })
   @IsOptional()
-  @Min(1, { message: 'El puntaje mínimo es 1' })
-  @Max(10, { message: 'El puntaje máximo es 10' })
+  @Min(0, { message: 'El puntaje mínimo es 0' })
+  @Max(5, { message: 'El puntaje máximo es 5' })
   soft_skills_score?: number;
 
   @IsString({ message: 'El comentario debe ser un texto válido' })
   @IsNotEmpty({ message: 'El comentario es obligatorio' })
+  @MaxLength(1000, { message: 'El comentario no puede exceder los 1000 caracteres' })
   comment: string;
 }

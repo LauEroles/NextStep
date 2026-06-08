@@ -14,16 +14,16 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 100, name: 'first_name' })
+  @Column({ type: 'varchar', length: 50, name: 'first_name' })
   firstName: string;
 
-  @Column({ type: 'varchar', length: 100, name: 'last_name' })
+  @Column({ type: 'varchar', length: 50, name: 'last_name' })
   lastName: string;
 
-  @Column({ unique: true })
+  @Column({ type: 'varchar', length: 50, unique: true })
   email: string;
 
-  @Column({ select: false })
+  @Column({ type: 'varchar', length: 255, select: false })
   password: string;
 
   @ManyToOne(() => Role, (role) => role.users, { eager: true })

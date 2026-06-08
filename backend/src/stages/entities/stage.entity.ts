@@ -5,12 +5,12 @@ export class Stage {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 100, unique: true })
+  @Column({ type: 'varchar', length: 50, unique: true })
   name: string;
 
   @Column({ name: 'sequence_order', type: 'int', unique: true })
   sequenceOrder: number;
 
-  @Column({ type: 'boolean', default: false, name: 'is_terminal' })
+  @Column({ type: 'boolean', name: 'is_terminal' })
   isTerminal: boolean;
 }
