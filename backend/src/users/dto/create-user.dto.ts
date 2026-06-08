@@ -6,6 +6,7 @@ import {
   MaxLength,
   IsOptional,
   IsEnum,
+  IsDateString,
 } from 'class-validator';
 
 export enum UserRoleName{
@@ -40,4 +41,9 @@ export class CreateUserDto {
   @IsEnum(UserRoleName, { message: 'El nombre del rol debe ser uno de los valores válidos' })
   @IsOptional()
   role_name?: string;
+
+
+  @IsDateString({},{ message: 'La fecha de nacimiento debe ser una fecha válida' })
+  @IsOptional()
+  birth_date?: string;
 }
