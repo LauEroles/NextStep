@@ -35,4 +35,28 @@ export class AuthService {
       token: token,
     };
   }
+
+
+  async googleSignIn(email: string) {
+    const user = await this.userService.findByEmail(email, false);
+
+    if (!user) {
+      throw new UnauthorizedException(
+        'No existe una cuenta con este email. Registrate primero.',
+      );
+    }
+
+    const payload: ActiveUser = {
+      id: user.id,
+      email: user.email,
+      role: user.role.name,
+    };
+
+    const token = await this.jwtService.signAsync(payload);
+
+    return {
+      user,
+      token,
+    };
+  }
 }
