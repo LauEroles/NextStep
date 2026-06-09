@@ -8,27 +8,24 @@ import { Repository } from 'typeorm';
 import { CreateJobApplicationDto } from './dto/create-job-application.dto';
 import { UpdateJobApplicationDto } from './dto/update-job-application.dto';
 import { JobApplication } from './entities/job-application.entity';
-import { UsersService } from '../users/users.service';
 import { JobOffersService } from '../job-offers/job-offers.service';
+import { StagesService } from '../stages/stages.service';
 
 @Injectable()
 export class JobApplicationsService {
   constructor(
     @InjectRepository(JobApplication)
     private readonly applicationRepo: Repository<JobApplication>,
-    private readonly usersService: UsersService,
     private readonly jobOffersService: JobOffersService,
+    private readonly stagesService: StagesService,
   ) {}
 
   async create(
     createJobApplicationDto: CreateJobApplicationDto,
-    candidateId: number,
+    applicantId: number,
   ) {
-    const candidate = await this.usersService.findOne(candidateId);
-    if (!candidate) throw new NotFoundException('El candidato no existe.');
-
     const jobOffer = await this.jobOffersService.findOne(
-      createJobApplicationDto.jobOffer_id,
+      createJobApplicationDto.job_offer_id,
     );
 
     if (!jobOffer) {
@@ -40,16 +37,22 @@ export class JobApplicationsService {
     }
 
     const existingApplication = await this.applicationRepo.findOne({
-      where: { candidate_id: candidate.id, jobOffer_id: jobOffer.id },
+      where: {
+        applicant: { id: applicantId },
+        jobOffer: { id: jobOffer.id },
+      },
     });
 
     if (existingApplication) {
       throw new BadRequestException('Ya te has postulado a esta oferta.');
     }
 
+    const initialStage = await this.stagesService.findInitialStage();
+
     const newApplication = this.applicationRepo.create({
-      candidate_id: candidate.id,
-      jobOffer_id: jobOffer.id,
+      applicant: { id: applicantId },
+      jobOffer: { id: jobOffer.id },
+      currentStage: initialStage,
     });
 
     return await this.applicationRepo.save(newApplication);
@@ -57,14 +60,14 @@ export class JobApplicationsService {
 
   async findAll() {
     return await this.applicationRepo.find({
-      relations: ['jobOffer', 'candidate'], // Añadir 'feedback'
+      relations: ['jobOffer', 'applicant', 'currentStage'],
     });
   }
 
   async findOne(id: number) {
     const application = await this.applicationRepo.findOne({
       where: { id },
-      relations: ['jobOffer', 'candidate'],
+      relations: ['jobOffer', 'applicant', 'currentStage'],
     });
 
     if (!application) {
@@ -77,12 +80,18 @@ export class JobApplicationsService {
   async update(id: number, updateJobApplicationDto: UpdateJobApplicationDto) {
     const application = await this.findOne(id);
 
-    const updatedApplication = Object.assign(
-      application,
-      updateJobApplicationDto,
+    const targetStage = await this.stagesService.findOne(
+      updateJobApplicationDto.current_stage_id,
     );
 
-    return await this.applicationRepo.save(updatedApplication);
+    if (application.currentStage.isTerminal) {
+      throw new BadRequestException(
+        'No se puede cambiar la etapa de una postulación que ya ha finalizado.',
+      );
+    }
+
+    application.currentStage = targetStage;
+    return await this.applicationRepo.save(application);
   }
 
   async remove(id: number) {

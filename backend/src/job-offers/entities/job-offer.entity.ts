@@ -8,44 +8,28 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
-import { Seniority } from '../enums/seniority.enum';
-import { JobOfferStatus } from '../enums/job-offers.enum';
+import { Seniority } from '../../seniority/entities/seniority.entity';
 
 @Entity('job_offers')
 export class JobOffer {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'varchar', length: 50 })
   title: string;
 
   @Column({ type: 'text' })
   description: string;
 
-  @Column({
-    type: 'enum',
-    enum: Seniority,
-  })
+  @ManyToOne(() => Seniority)
+  @JoinColumn({ name: 'seniority_id' })
   seniority: Seniority;
-
-  @Column({ type: 'varchar', length: 500 })
-  skills_required: string;
-
-  @Column({
-    type: 'enum',
-    enum: JobOfferStatus,
-    default: JobOfferStatus.ACTIVE,
-  })
-  status: JobOfferStatus;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'recruiter_id' })
   recruiter: User;
 
-  @Column()
-  recruiter_id: number;
-
-  @Column()
+  @Column({ type: 'boolean', default: true })
   isActive: boolean;
 
   @CreateDateColumn()

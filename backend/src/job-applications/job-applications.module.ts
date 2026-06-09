@@ -5,12 +5,14 @@ import { JobApplicationsController } from './job-applications.controller';
 import { JobApplication } from './entities/job-application.entity';
 import { UsersModule } from '../users/users.module';
 import { JobOffersModule } from '../job-offers/job-offers.module';
+import { StagesModule } from '../stages/stages.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([JobApplication]),
     UsersModule,
     JobOffersModule,
+    StagesModule,
   ],
   controllers: [JobApplicationsController],
   providers: [JobApplicationsService],

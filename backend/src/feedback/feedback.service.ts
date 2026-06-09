@@ -12,17 +12,29 @@ export class FeedbackService {
     private readonly feedbackRepository: Repository<Feedback>,
   ) {}
 
-  async create(createFeedbackDto: CreateFeedbackDto) {
-    const feedback = this.feedbackRepository.create(createFeedbackDto);
+  async create(createFeedbackDto: CreateFeedbackDto, recruiterId: number) {
+    const feedback = this.feedbackRepository.create({
+      comment: createFeedbackDto.comment,
+      technical_score: createFeedbackDto.technical_score,
+      soft_skills_score: createFeedbackDto.soft_skills_score,
+      application: { id: createFeedbackDto.application_id },
+      stage: { id: createFeedbackDto.stage_id },
+      recruiter: { id: recruiterId },
+    });
     return await this.feedbackRepository.save(feedback);
   }
 
   async findAll() {
-    return await this.feedbackRepository.find();
+    return await this.feedbackRepository.find({
+      relations: ['application', 'stage', 'recruiter'],
+    });
   }
 
   async findOne(id: number) {
-    const feedback = await this.feedbackRepository.findOneBy({ id });
+    const feedback = await this.feedbackRepository.findOne({
+      where: { id },
+      relations: ['application', 'stage', 'recruiter'],
+    });
     if (!feedback) {
       throw new NotFoundException(`El feedback con id #${id} no existe`);
     }

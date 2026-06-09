@@ -4,29 +4,31 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
-import { UserRole } from '../enums/user-role.enum';
+import { Role } from '../../roles/entities/role.entity';
 
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 100 })
-  name: string;
+  @Column({ type: 'varchar', length: 50, name: 'first_name' })
+  firstName: string;
 
-  @Column({ unique: true })
+  @Column({ type: 'varchar', length: 50, name: 'last_name' })
+  lastName: string;
+
+  @Column({ type: 'varchar', length: 50, unique: true })
   email: string;
 
-  @Column({ select: false })
+  @Column({ type: 'varchar', length: 255, select: false })
   password: string;
 
-  @Column({
-    type: 'enum',
-    enum: UserRole,
-    default: UserRole.APPLICANT,
-  })
-  role: UserRole;
+  @ManyToOne(() => Role, (role) => role.users, { eager: true })
+  @JoinColumn({ name: 'role_id' })
+  role: Role;
 
   @CreateDateColumn()
   createdAt: Date;

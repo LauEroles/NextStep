@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { JobApplication } from '../../job-applications/entities/job-application.entity';
+import { Stage } from '../../stages/entities/stage.entity';
 
 @Entity('feedback')
 export class Feedback {
@@ -18,25 +19,23 @@ export class Feedback {
   @JoinColumn({ name: 'application_id' })
   application: JobApplication;
 
-  @Column()
-  application_id: number;
-
   @ManyToOne(() => User)
   @JoinColumn({ name: 'recruiter_id' })
   recruiter: User;
 
-  @Column()
-  recruiter_id: number;
+  @ManyToOne(() => Stage)
+  @JoinColumn({ name: 'stage_id' })
+  stage: Stage;
 
-  @Column({ type: 'int' })
+  @Column({ type: 'int', nullable: true })
   technical_score: number;
 
-  @Column({ type: 'int' })
+  @Column({ type: 'int', nullable: true })
   soft_skills_score: number;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text' })
   comment: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 }
