@@ -22,13 +22,13 @@ export class CreateFeedbackDto {
   @IsOptional()
   @Min(0, { message: 'El puntaje mínimo es 0' })
   @Max(5, { message: 'El puntaje máximo es 5' })
-  technical_score?: number;
+  technicalScore?: number;
 
   @IsInt({ message: 'El puntaje soft skills debe ser un número entero' })
   @IsOptional()
   @Min(0, { message: 'El puntaje mínimo es 0' })
   @Max(5, { message: 'El puntaje máximo es 5' })
-  soft_skills_score?: number;
+  softSkillsScore?: number;
 
   @IsString({ message: 'El comentario debe ser un texto válido' })
   @IsNotEmpty({ message: 'El comentario es obligatorio' })
