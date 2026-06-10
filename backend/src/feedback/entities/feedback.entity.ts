@@ -33,7 +33,7 @@ export class Feedback {
   @Column({ type: 'int', nullable: true })
   soft_skills_score: number;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   comment: string;
 
   @Column({ type: 'text', nullable: true, name: 'internal_notes' })
