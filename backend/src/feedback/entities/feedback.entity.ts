@@ -36,6 +36,12 @@ export class Feedback {
   @Column({ type: 'text' })
   comment: string;
 
+  @Column({ type: 'text', nullable: true, name: 'internal_notes' })
+  internalNotes: string;
+
+  @Column({ type: 'text', nullable: true, name: 'public_feedback' })
+  publicFeedback: string;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 }
