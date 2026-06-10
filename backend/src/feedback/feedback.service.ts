@@ -15,8 +15,8 @@ export class FeedbackService {
   async create(createFeedbackDto: CreateFeedbackDto, recruiterId: number) {
     const feedback = this.feedbackRepository.create({
       comment: createFeedbackDto.comment,
-      technical_score: createFeedbackDto.technical_score,
-      soft_skills_score: createFeedbackDto.soft_skills_score,
+      technicalScore: createFeedbackDto.technicalScore,
+      softSkillsScore: createFeedbackDto.softSkillsScore,
       application: { id: createFeedbackDto.application_id },
       stage: { id: createFeedbackDto.stage_id },
       recruiter: { id: recruiterId },

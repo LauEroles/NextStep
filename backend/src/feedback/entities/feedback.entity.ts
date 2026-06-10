@@ -27,14 +27,20 @@ export class Feedback {
   @JoinColumn({ name: 'stage_id' })
   stage: Stage;
 
-  @Column({ type: 'int', nullable: true })
-  technical_score: number;
+  @Column({ type: 'int', nullable: true , name: 'technical_score' })
+  technicalScore: number;
 
-  @Column({ type: 'int', nullable: true })
-  soft_skills_score: number;
+  @Column({ type: 'int', nullable: true , name: 'soft_skills_score' })
+  softSkillsScore: number;
 
-  @Column({ type: 'text' })
-  comment: string;
+  @Column({ type: 'text', nullable: true })
+  comment?: string;
+
+  @Column({ type: 'text', nullable: true, name: 'internal_notes' })
+  internalNotes: string;
+
+  @Column({ type: 'text', nullable: true, name: 'public_feedback' })
+  publicFeedback: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
