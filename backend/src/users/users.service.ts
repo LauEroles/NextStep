@@ -28,6 +28,19 @@ export class UsersService {
       throw new ConflictException('El correo electrónico ya está registrado');
     }
 
+    if (createUserDto.birth_date) {
+    const birth = new Date(createUserDto.birth_date);
+    const today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+        age--;
+        }
+      if (age < 18) {
+        throw new ForbiddenException('Debés ser mayor de 18 años para registrarte');
+      }
+    }
+
     let userRole: Role;
     if (createUserDto.role_name) {
       userRole = await this.rolesService.findByName(createUserDto.role_name);
