@@ -28,8 +28,8 @@ export class UsersService {
       throw new ConflictException('El correo electrónico ya está registrado');
     }
 
-    if (createUserDto.birth_date) {
-    const birth = new Date(createUserDto.birth_date);
+    if (createUserDto.birthDate) {
+    const birth = new Date(createUserDto.birthDate);
     const today = new Date();
     let age = today.getFullYear() - birth.getFullYear();
     const monthDiff = today.getMonth() - birth.getMonth();
@@ -42,8 +42,8 @@ export class UsersService {
     }
 
     let userRole: Role;
-    if (createUserDto.role_name) {
-      userRole = await this.rolesService.findByName(createUserDto.role_name);
+    if (createUserDto.roleName) {
+      userRole = await this.rolesService.findByName(createUserDto.roleName);
   
     } else {
       userRole = await this.rolesService.findDefaultRole();
@@ -51,10 +51,11 @@ export class UsersService {
 
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
+    const {roleName, birthDate, ...userFields} = createUserDto;
+
     const newUser = this.userRepository.create({
-      firstName: createUserDto.first_name,
-      lastName: createUserDto.last_name,
-      email: createUserDto.email,
+    
+      ...userFields,
       password: hashedPassword,
       role: userRole,
     });
