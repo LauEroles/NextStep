@@ -13,5 +13,5 @@ export class CreateJobOfferDto {
 
   @IsNumber({}, { message: 'El ID de seniority debe ser un número válido' })
   @IsNotEmpty({ message: 'El ID de seniority es obligatorio' })
-  seniority_id: number;
+  seniorityId: number;
 }

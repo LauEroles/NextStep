@@ -24,72 +24,65 @@ export class JobApplicationsService {
     createJobApplicationDto: CreateJobApplicationDto,
     applicantId: number,
   ) {
-    const jobOffer = await this.jobOffersService.findOne(
-      createJobApplicationDto.job_offer_id,
-    );
+    const { jobOfferId, ...applicationData } = createJobApplicationDto;
 
+    const jobOffer = await this.jobOffersService.findOne(jobOfferId);
     if (!jobOffer) {
       throw new NotFoundException('La oferta de trabajo no existe.');
     }
-
     if (!jobOffer.isActive) {
       throw new BadRequestException('Esta oferta no se encuentra activa.');
     }
-
-    const existingApplication = await this.applicationRepo.findOne({
-      where: {
-        applicant: { id: applicantId },
-        jobOffer: { id: jobOffer.id },
-      },
-    });
-
-    if (existingApplication) {
+    if (await this.exists(applicantId, jobOfferId)) {
       throw new BadRequestException('Ya te has postulado a esta oferta.');
     }
-
     const initialStage = await this.stagesService.findInitialStage();
 
     const newApplication = this.applicationRepo.create({
+      ...applicationData,
       applicant: { id: applicantId },
-      jobOffer: { id: jobOffer.id },
+      jobOffer: jobOffer,
       currentStage: initialStage,
     });
-
     return await this.applicationRepo.save(newApplication);
   }
 
-  async findAll() {
-    return await this.applicationRepo.find({
-      relations: ['jobOffer', 'applicant', 'currentStage'],
+  async exists(applicantId: number, jobOfferId: number) {
+    const application = await this.applicationRepo.findOne({
+      where: {
+        applicant: { id: applicantId },
+        jobOffer: { id: jobOfferId },
+      },
     });
+    return !!application;
   }
 
-  async findOne(id: number) {
+  async findAll() {
+    return await this.applicationRepo.find();
+  }
+
+  async findOne(id: number, relations?: string[]) {
     const application = await this.applicationRepo.findOne({
       where: { id },
-      relations: ['jobOffer', 'applicant', 'currentStage'],
+      relations: relations || [],
     });
-
     if (!application) {
-      throw new NotFoundException(`La postulación #${id} no fue encontrada.`);
+      throw new NotFoundException(`No se encontró la postulación.`);
     }
-
     return application;
   }
 
   async update(id: number, updateJobApplicationDto: UpdateJobApplicationDto) {
-    const application = await this.findOne(id);
+    const application = await this.findOne(id, ['currentStage']);
 
     const targetStage = await this.stagesService.findOne(
-      updateJobApplicationDto.current_stage_id,
+      updateJobApplicationDto.stageId,
     );
-
     if (application.currentStage.isTerminal) {
       throw new BadRequestException(
         'No se puede cambiar la etapa de una postulación que ya ha finalizado.',
       );
     }
-
     application.currentStage = targetStage;
     return await this.applicationRepo.save(application);
   }
