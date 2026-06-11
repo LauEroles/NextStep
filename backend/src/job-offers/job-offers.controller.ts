@@ -31,19 +31,17 @@ export class JobOffersController {
     return this.jobOffersService.create(createJobOfferDto, currentUser.id);
   }
 
-  @Roles('admin', 'recruiter', 'applicant')
   @Get()
   findAll() {
     return this.jobOffersService.findAll();
   }
 
-  @Roles('admin', 'recruiter', 'applicant')
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.jobOffersService.findOne(+id);
   }
 
-  @Roles('recruiter')
+  @Roles('recruiter', 'admin')
   @Patch(':id')
   update(
     @Param('id') id: string,
