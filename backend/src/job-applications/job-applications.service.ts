@@ -24,32 +24,37 @@ export class JobApplicationsService {
     createJobApplicationDto: CreateJobApplicationDto,
     applicantId: number,
   ) {
-    const jobOffer = await this.jobOffersService.findOne(
-      createJobApplicationDto.jobOfferId,
-    );
+    const { jobOfferId, ...applicationData } = createJobApplicationDto;
+
+    const jobOffer = await this.jobOffersService.findOne(jobOfferId);
     if (!jobOffer) {
       throw new NotFoundException('La oferta de trabajo no existe.');
     }
     if (!jobOffer.isActive) {
       throw new BadRequestException('Esta oferta no se encuentra activa.');
     }
-    const existingApplication = await this.applicationRepo.findOne({
-      where: {
-        applicant: { id: applicantId },
-        jobOffer: { id: jobOffer.id },
-      },
-    });
-    if (existingApplication) {
+    if (await this.exists(applicantId, jobOfferId)) {
       throw new BadRequestException('Ya te has postulado a esta oferta.');
     }
     const initialStage = await this.stagesService.findInitialStage();
 
     const newApplication = this.applicationRepo.create({
+      ...applicationData,
       applicant: { id: applicantId },
       jobOffer: jobOffer,
       currentStage: initialStage,
     });
     return await this.applicationRepo.save(newApplication);
+  }
+
+  async exists(applicantId: number, jobOfferId: number) {
+    const application = await this.applicationRepo.findOne({
+      where: {
+        applicant: { id: applicantId },
+        jobOffer: { id: jobOfferId },
+      },
+    });
+    return !!application;
   }
 
   async findAll() {
@@ -62,7 +67,7 @@ export class JobApplicationsService {
       relations: relations || [],
     });
     if (!application) {
-      throw new NotFoundException(`La postulación no fue encontrada.`);
+      throw new NotFoundException(`No se encontró la postulación.`);
     }
     return application;
   }
