@@ -9,9 +9,8 @@ describe("create-userDto", () => {
         dto.last_name="peña";
         dto.email="Jose@gmail.com";
         dto.password="12345678";
-        dto.role_name="admin";
-        dto.birth_date="27/04/2000";
-
+        dto.role_name = "applicant";
+        dto.birth_date = "2000-04-27";
         const errors: ValidationError[] = await validate(dto);
         expect(errors.length).toBe(0);
     });
