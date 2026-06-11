@@ -25,71 +25,59 @@ export class JobApplicationsService {
     applicantId: number,
   ) {
     const jobOffer = await this.jobOffersService.findOne(
-      createJobApplicationDto.job_offer_id,
+      createJobApplicationDto.jobOfferId,
     );
-
     if (!jobOffer) {
       throw new NotFoundException('La oferta de trabajo no existe.');
     }
-
     if (!jobOffer.isActive) {
       throw new BadRequestException('Esta oferta no se encuentra activa.');
     }
-
     const existingApplication = await this.applicationRepo.findOne({
       where: {
         applicant: { id: applicantId },
         jobOffer: { id: jobOffer.id },
       },
     });
-
     if (existingApplication) {
       throw new BadRequestException('Ya te has postulado a esta oferta.');
     }
-
     const initialStage = await this.stagesService.findInitialStage();
 
     const newApplication = this.applicationRepo.create({
       applicant: { id: applicantId },
-      jobOffer: { id: jobOffer.id },
+      jobOffer: jobOffer,
       currentStage: initialStage,
     });
-
     return await this.applicationRepo.save(newApplication);
   }
 
   async findAll() {
-    return await this.applicationRepo.find({
-      relations: ['jobOffer', 'applicant', 'currentStage'],
-    });
+    return await this.applicationRepo.find();
   }
 
-  async findOne(id: number) {
+  async findOne(id: number, relations?: string[]) {
     const application = await this.applicationRepo.findOne({
       where: { id },
-      relations: ['jobOffer', 'applicant', 'currentStage'],
+      relations: relations || [],
     });
-
     if (!application) {
-      throw new NotFoundException(`La postulación #${id} no fue encontrada.`);
+      throw new NotFoundException(`La postulación no fue encontrada.`);
     }
-
     return application;
   }
 
   async update(id: number, updateJobApplicationDto: UpdateJobApplicationDto) {
-    const application = await this.findOne(id);
+    const application = await this.findOne(id, ['currentStage']);
 
     const targetStage = await this.stagesService.findOne(
-      updateJobApplicationDto.current_stage_id,
+      updateJobApplicationDto.stageId,
     );
-
     if (application.currentStage.isTerminal) {
       throw new BadRequestException(
         'No se puede cambiar la etapa de una postulación que ya ha finalizado.',
       );
     }
-
     application.currentStage = targetStage;
     return await this.applicationRepo.save(application);
   }

@@ -36,7 +36,7 @@ export class JobApplicationsController {
     );
   }
 
-  @Roles('admin')
+  @Roles('admin', 'recruiter')
   @Get()
   findAll() {
     return this.jobApplicationsService.findAll();
@@ -57,7 +57,7 @@ export class JobApplicationsController {
     return this.jobApplicationsService.update(+id, updateJobApplicationDto);
   }
 
-  @Roles('admin', 'recruiter', 'applicant')
+  @Roles('admin', 'recruiter')
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.jobApplicationsService.remove(+id);
