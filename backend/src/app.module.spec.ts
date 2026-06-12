@@ -13,8 +13,6 @@ import { AppModule } from "./app.module";
 import { UsersModule } from "./users/users.module";
 
 describe("app.module",()=>{
-    
-      beforeEach(async () => {
         let appController:AppController;
         let appService:AppService;
         let usersModule:UsersModule;
@@ -26,9 +24,11 @@ describe("app.module",()=>{
         let stangesModule:StagesModule;
         let seniorityModule:SeniorityModule;
         let auditLogsModule:AuditLogsModule;
+
+        beforeEach(async () => {
         const moduleRef: TestingModule = await Test.createTestingModule({
             imports:[AppModule],
-        }).compile();
+        },).compile();
     
         appController = moduleRef.get<AppController>(AppController);
         appService = moduleRef.get<AppService>(AppService);
@@ -44,7 +44,7 @@ describe("app.module",()=>{
 
 
 
-      });
+    },30000);
         it("obvservar que todos los elementos esten definidos",()=>{
             expect(appController).toBeDefined();
             expect(appService).toBeDefined();
