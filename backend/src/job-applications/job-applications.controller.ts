@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { JobApplicationsService } from './job-applications.service';
 import { CreateJobApplicationDto } from './dto/create-job-application.dto';
@@ -36,12 +37,14 @@ export class JobApplicationsController {
     );
   }
 
-  @Roles('admin')
+  @Roles('admin', 'recruiter', 'applicant')
   @Get()
-  findAll() {
+  findAll(@Query('jobOfferId') jobOfferId?: string) {
+    if (jobOfferId) {
+      return this.jobApplicationsService.findByJobOffer(+jobOfferId);
+    }
     return this.jobApplicationsService.findAll();
   }
-
   @Roles('admin', 'recruiter', 'applicant')
   @Get(':id')
   findOne(@Param('id') id: string) {

@@ -64,6 +64,13 @@ export class JobApplicationsService {
     });
   }
 
+  async findByJobOffer(jobOfferId: number) {
+  return await this.applicationRepo.find({
+    where: { jobOffer: { id: jobOfferId } },
+    relations: ['jobOffer', 'applicant', 'currentStage'],
+  });
+}
+
   async findOne(id: number) {
     const application = await this.applicationRepo.findOne({
       where: { id },
