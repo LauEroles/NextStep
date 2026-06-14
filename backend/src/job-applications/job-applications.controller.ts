@@ -60,7 +60,7 @@ export class JobApplicationsController {
     return this.jobApplicationsService.update(+id, updateJobApplicationDto);
   }
 
-  @Roles('admin', 'recruiter', 'applicant')
+  @Roles('admin', 'recruiter')
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.jobApplicationsService.remove(+id);

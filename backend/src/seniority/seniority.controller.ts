@@ -16,13 +16,11 @@ export class SeniorityController {
     return this.seniorityService.create(createSeniorityDto);
   }
 
-  @Roles('admin', 'recruiter')
   @Get()
   findAll() {
     return this.seniorityService.findAll();
   }
-
-  @Roles('admin', 'recruiter')
+  
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.seniorityService.findOne(+id);

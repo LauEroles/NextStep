@@ -26,13 +26,11 @@ export class StagesController {
     return this.stagesService.create(createStageDto);
   }
 
-  @Roles('admin', 'recruiter')
   @Get()
   findAll() {
     return this.stagesService.findAll();
   }
 
-  @Roles('admin', 'recruiter', 'applicant')
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.stagesService.findOne(+id);
