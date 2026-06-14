@@ -30,9 +30,12 @@ export class User {
   @JoinColumn({ name: 'role_id' })
   role: Role;
 
-  @CreateDateColumn()
+  @Column({ type: 'boolean', name: 'is_active', default: true })
+  isActive: boolean;
+
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 }

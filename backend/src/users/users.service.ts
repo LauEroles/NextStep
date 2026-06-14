@@ -27,42 +27,27 @@ export class UsersService {
     if (userExists) {
       throw new ConflictException('El correo electrónico ya está registrado');
     }
-
     if (createUserDto.birthDate) {
-    const birth = new Date(createUserDto.birthDate);
-    const today = new Date();
-    let age = today.getFullYear() - birth.getFullYear();
-    const monthDiff = today.getMonth() - birth.getMonth();
-      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-        age--;
-        }
-      if (age < 18) {
-        throw new ForbiddenException('Debés ser mayor de 18 años para registrarte');
-      }
+      this.validateBirthDate(createUserDto.birthDate);
     }
-
     let userRole: Role;
     if (createUserDto.roleName) {
       userRole = await this.rolesService.findByName(createUserDto.roleName);
-  
     } else {
       userRole = await this.rolesService.findDefaultRole();
     }
-
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
-    const {roleName, birthDate, ...userFields} = createUserDto;
+    const { roleName: _role, birthDate: _birth, ...userFields } = createUserDto;
 
     const newUser = this.userRepository.create({
-    
       ...userFields,
       password: hashedPassword,
       role: userRole,
     });
-
     await this.userRepository.save(newUser);
 
-    const { password: _, ...result } = newUser;
+    const { password: _pass, ...result } = newUser;
     return result;
   }
 
@@ -113,5 +98,23 @@ export class UsersService {
     const user = await this.findOne(id);
     await this.userRepository.remove(user);
     return { message: `Usuario #${id} eliminado correctamente` };
+  }
+
+  validateBirthDate(date: string) {
+    const birth = new Date(date);
+    const today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birth.getDate())
+    ) {
+      age--;
+    }
+    if (age < 18) {
+      throw new ForbiddenException(
+        'Debés ser mayor de 18 años para registrarte',
+      );
+    }
   }
 }
