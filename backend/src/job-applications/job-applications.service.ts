@@ -10,6 +10,8 @@ import { UpdateJobApplicationDto } from './dto/update-job-application.dto';
 import { JobApplication } from './entities/job-application.entity';
 import { JobOffersService } from '../job-offers/job-offers.service';
 import { StagesService } from '../stages/stages.service';
+import { ApplicationFactory } from './factories/application.factory';
+
 
 @Injectable()
 export class JobApplicationsService {
@@ -18,6 +20,8 @@ export class JobApplicationsService {
     private readonly applicationRepo: Repository<JobApplication>,
     private readonly jobOffersService: JobOffersService,
     private readonly stagesService: StagesService,
+    private readonly applicationFactory: ApplicationFactory,
+
   ) {}
 
   async create(
@@ -48,14 +52,14 @@ export class JobApplicationsService {
     }
 
     const initialStage = await this.stagesService.findInitialStage();
+    const allStages = await this.stagesService.findAll();
 
-    const newApplication = this.applicationRepo.create({
-      applicant: { id: applicantId },
-      jobOffer: { id: jobOffer.id },
-      currentStage: initialStage,
-    });
-
-    return await this.applicationRepo.save(newApplication);
+    return await this.applicationFactory.create(
+      jobOffer.id,
+      applicantId,
+      initialStage,
+      allStages,
+    );
   }
 
   async findAll() {
