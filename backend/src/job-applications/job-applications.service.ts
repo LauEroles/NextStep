@@ -10,6 +10,8 @@ import { UpdateJobApplicationDto } from './dto/update-job-application.dto';
 import { JobApplication } from './entities/job-application.entity';
 import { JobOffersService } from '../job-offers/job-offers.service';
 import { StagesService } from '../stages/stages.service';
+import { ApplicationFactory } from './factories/application.factory';
+
 
 @Injectable()
 export class JobApplicationsService {
@@ -18,6 +20,8 @@ export class JobApplicationsService {
     private readonly applicationRepo: Repository<JobApplication>,
     private readonly jobOffersService: JobOffersService,
     private readonly stagesService: StagesService,
+    private readonly applicationFactory: ApplicationFactory,
+
   ) {}
 
   async create(
@@ -37,14 +41,14 @@ export class JobApplicationsService {
       throw new BadRequestException('Ya te has postulado a esta oferta.');
     }
     const initialStage = await this.stagesService.findInitialStage();
+    const allStages = await this.stagesService.findAll();
 
-    const newApplication = this.applicationRepo.create({
-      ...applicationData,
-      applicant: { id: applicantId },
-      jobOffer: jobOffer,
-      currentStage: initialStage,
-    });
-    return await this.applicationRepo.save(newApplication);
+    return await this.applicationFactory.create(
+      jobOffer.id,
+      applicantId,
+      initialStage,
+      allStages,
+    );
   }
 
   async exists(applicantId: number, jobOfferId: number) {
@@ -58,9 +62,19 @@ export class JobApplicationsService {
   }
 
   async findAll() {
-    return await this.applicationRepo.find();
+  return await this.applicationRepo.find({
+    relations: ['jobOffer', 'applicant', 'currentStage'],
+    });
   }
 
+  async findByJobOffer(jobOfferId: number) {
+  return await this.applicationRepo.find({
+    where: { jobOffer: { id: jobOfferId } },
+    relations: ['jobOffer', 'applicant', 'currentStage'],
+  });
+}
+
+  
   async findOne(id: number, relations?: string[]) {
     const application = await this.applicationRepo.findOne({
       where: { id },
