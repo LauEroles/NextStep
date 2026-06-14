@@ -24,7 +24,9 @@ export class JobOffersService {
   }
 
   async findAll() {
-    return await this.jobOfferRepository.find();
+    return await this.jobOfferRepository.find({
+      relations: ['seniority', 'recruiter'],
+    });
   }
 
   async findOne(id: number, relations?: string[]) {

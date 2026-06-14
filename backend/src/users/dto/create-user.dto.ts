@@ -9,9 +9,9 @@ import {
   IsDateString,
 } from 'class-validator';
 
-export enum UserRoleName{
+export enum UserRoleName {
   APPLICANT = 'applicant',
-  RECRUITER = 'recruiter'
+  RECRUITER = 'recruiter',
 }
 
 export class CreateUserDto {
@@ -42,8 +42,7 @@ export class CreateUserDto {
   @IsOptional()
   roleName?: string;
 
-
-  @IsDateString({},{ message: 'La fecha de nacimiento debe ser una fecha válida' })
+  @IsDateString({}, { message: 'La fecha de nacimiento debe ser una fecha válida' })
   @IsOptional()
   birthDate?: string;
 }

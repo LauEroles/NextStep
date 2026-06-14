@@ -35,6 +35,7 @@ export class StagesService {
 
   async findInitialStage() {
     const initialStage = await this.stageRepo.findOne({
+      where: {},
       order: { sequenceOrder: 'ASC' },
     });
     if (!initialStage) {
