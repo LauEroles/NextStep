@@ -13,6 +13,7 @@ import { StagesModule } from './stages/stages.module';
 import { SeniorityModule } from './seniority/seniority.module';
 import { AuditLogsModule } from './audit-logs/audit-logs.module';
 import { ScorecardsModule } from './scorecards/scorecards.module';
+import { CvModule } from './cv/cv.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { ScorecardsModule } from './scorecards/scorecards.module';
     SeniorityModule,
     AuditLogsModule,
     ScorecardsModule,
+    CvModule,
   ],
   controllers: [AppController],
   providers: [AppService],
