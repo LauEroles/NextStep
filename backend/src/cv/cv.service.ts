@@ -17,7 +17,7 @@ export class CvService {
 
     const cvFile = this.cvRepo.create({
       originalName: file.originalname,
-      storedName: file.filename,          // el nombre uuid.pdf que Multer generó
+      storedName: file.filename,          
       extension: ext,
       directory,
       userId,

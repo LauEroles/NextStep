@@ -14,7 +14,7 @@ export class CvFile {
   originalName: string;   // nombre original que mandó el usuario
 
   @Column()
-  storedName: string;     // nombre con UUID en disco: uuid-originalName.ext
+  storedName: string;     // nombre con el que se guardó en el servidor 
 
   @Column()
   extension: string;      // 'pdf', 'docx', etc.
