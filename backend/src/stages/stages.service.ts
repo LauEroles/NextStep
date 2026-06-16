@@ -14,9 +14,7 @@ export class StagesService {
 
   async create(createStageDto: CreateStageDto) {
     const stage = this.stageRepo.create({
-      name: createStageDto.name,
-      sequenceOrder: createStageDto.sequence_order,
-      isTerminal: createStageDto.is_terminal,
+      ...createStageDto,
     });
     return await this.stageRepo.save(stage);
   }
@@ -48,12 +46,8 @@ export class StagesService {
 
   async update(id: number, updateStageDto: UpdateStageDto) {
     const stage = await this.findOne(id);
-
-    if (updateStageDto.name) stage.name = updateStageDto.name;
-    if (updateStageDto.sequence_order)
-      stage.sequenceOrder = updateStageDto.sequence_order;
-
-    return await this.stageRepo.save(stage);
+    const updated = this.stageRepo.merge(stage, updateStageDto);
+    return await this.stageRepo.save(updated);
   }
 
   async remove(id: number) {

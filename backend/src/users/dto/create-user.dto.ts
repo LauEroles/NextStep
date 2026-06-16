@@ -9,9 +9,9 @@ import {
   IsDateString,
 } from 'class-validator';
 
-export enum UserRoleName{
+export enum UserRoleName {
   APPLICANT = 'applicant',
-  RECRUITER = 'recruiter'
+  RECRUITER = 'recruiter',
 }
 
 export class CreateUserDto {
@@ -19,13 +19,13 @@ export class CreateUserDto {
   @IsNotEmpty({ message: 'El nombre es obligatorio' })
   @MinLength(2, { message: 'El nombre debe tener al menos 2 caracteres' })
   @MaxLength(50, { message: 'El nombre es demasiado largo' })
-  first_name: string;
+  firstName: string;
 
   @IsString({ message: 'El apellido debe ser un texto válido' })
   @IsNotEmpty({ message: 'El apellido es obligatorio' })
   @MinLength(2, { message: 'El apellido debe tener al menos 2 caracteres' })
   @MaxLength(50, { message: 'El apellido es demasiado largo' })
-  last_name: string;
+  lastName: string;
 
   @IsEmail({}, { message: 'Debe ser un correo electrónico válido' })
   @IsNotEmpty({ message: 'El email es obligatorio' })
@@ -40,10 +40,9 @@ export class CreateUserDto {
 
   @IsEnum(UserRoleName, { message: 'El nombre del rol debe ser uno de los valores válidos' })
   @IsOptional()
-  role_name?: string;
+  roleName?: string;
 
-
-  @IsDateString({},{ message: 'La fecha de nacimiento debe ser una fecha válida' })
+  @IsDateString({}, { message: 'La fecha de nacimiento debe ser una fecha válida' })
   @IsOptional()
-  birth_date?: string;
+  birthDate?: string;
 }

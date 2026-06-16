@@ -16,8 +16,8 @@ export class CreateStageDto {
   @IsNotEmpty({ message: 'El orden de secuencia es obligatorio.' })
   @IsInt({ message: 'El orden de secuencia debe ser un número entero.' })
   @Min(1, { message: 'El orden de secuencia mínimo debe ser 1.' })
-  sequence_order: number;
+  sequenceOrder: number;
 
   @IsBoolean({ message: 'El valor debe ser verdadero o falso.' })
-  is_terminal: boolean;
+  isTerminal: boolean;
 }

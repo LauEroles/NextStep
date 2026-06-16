@@ -9,7 +9,7 @@ export class Role {
   @Column({ type: 'varchar', length: 50, unique: true })
   name: string;
 
-  @Column({ default: false })
+  @Column({ name: 'is_default', default: false })
   isDefault: boolean;
 
   @OneToMany(() => User, (user) => user.role)

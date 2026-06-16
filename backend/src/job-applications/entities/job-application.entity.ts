@@ -1,4 +1,5 @@
 import {
+  Column,
   CreateDateColumn,
   Entity,
   JoinColumn,
@@ -26,6 +27,9 @@ export class JobApplication {
   @ManyToOne(() => Stage)
   @JoinColumn({ name: 'current_stage_id' })
   currentStage: Stage;
+
+  @Column({type: 'text', nullable:true})
+  cvPath:string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

@@ -12,6 +12,8 @@ import { RolesModule } from './roles/roles.module';
 import { StagesModule } from './stages/stages.module';
 import { SeniorityModule } from './seniority/seniority.module';
 import { AuditLogsModule } from './audit-logs/audit-logs.module';
+import { ScorecardsModule } from './scorecards/scorecards.module';
+import { CvModule } from './cv/cv.module';
 
 @Module({
   imports: [
@@ -37,6 +39,8 @@ import { AuditLogsModule } from './audit-logs/audit-logs.module';
     StagesModule,
     SeniorityModule,
     AuditLogsModule,
+    ScorecardsModule,
+    CvModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -7,6 +7,8 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
+
 } from '@nestjs/common';
 import { FeedbackService } from './feedback.service';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
@@ -31,12 +33,15 @@ export class FeedbackController {
     return this.feedbackService.create(createFeedbackDto, currentUser.id);
   }
 
-  @Roles('admin')
+
+  @Roles('admin', 'recruiter')
   @Get()
-  findAll() {
+  findAll(@Query('applicationId') applicationId?: string) {
+    if (applicationId) {
+      return this.feedbackService.findByApplication(+applicationId);
+    }
     return this.feedbackService.findAll();
   }
-
   @Roles('admin', 'recruiter', 'applicant')
   @Get(':id')
   findOne(@Param('id') id: string) {
