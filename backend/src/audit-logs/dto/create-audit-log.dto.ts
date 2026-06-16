@@ -1,6 +1,6 @@
 export class CreateAuditLogDto {
-    userId: number;
+    userId: number | null;
     action: string;
     entity: string;
-    entityId?: string;
+    entity_id?: string;
 }

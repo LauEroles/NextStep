@@ -17,9 +17,6 @@ export class AuditLog {
     @JoinColumn({ name: 'user_id' })
     user: User;
 
-    @Column()
-    userId: number;
-
     @Column({ type: 'varchar', length: 100 })
     action: string;
 

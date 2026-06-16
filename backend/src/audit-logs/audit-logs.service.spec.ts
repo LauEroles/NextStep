@@ -1,18 +1,29 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { AuditLogsService } from './audit-logs.service';
+@Injectable()
+export class AuditLogsService {
+  constructor(
+    @InjectRepository(AuditLog)
+    private readonly auditLogRepository: Repository<AuditLog>,
+  ) {}
 
-describe('AuditLogsService', () => {
-  let service: AuditLogsService;
+  async create(createAuditLogDto: CreateAuditLogDto) {
+    const newLog = this.auditLogRepository.create({
+      user: { id: createAuditLogDto.userId },
+      action: createAuditLogDto.action,
+      entity: createAuditLogDto.entity,
+      entity_id: createAuditLogDto.entity_id,
+    });
+    return await this.auditLogRepository.save(newLog);
+  }
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [AuditLogsService],
-    }).compile();
+  async findAll() {
+    return await this.auditLogRepository.find();
+  }
 
-    service = module.get<AuditLogsService>(AuditLogsService);
-  });
-
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
-});
+  async findOne(id: number) {
+    const log = await this.auditLogRepository.findOneBy({ id });
+    if (!log) {
+      throw new NotFoundException(`El log con el id #${id} no existe`);
+    }
+    return log;
+  }
+}
