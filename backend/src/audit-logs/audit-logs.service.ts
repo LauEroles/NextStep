@@ -12,12 +12,20 @@ export class AuditLogsService {
   ) { }
 
   async create(createAuditLogDto: CreateAuditLogDto) {
-    const newLog = this.auditLogRepository.create(createAuditLogDto);
+    const { userId, ...rest } = createAuditLogDto;
+
+    const newLog = this.auditLogRepository.create({
+      ...rest,
+      user: userId ? ({ id: userId } as any) : null,
+    });
+
     return await this.auditLogRepository.save(newLog);
   }
 
   async findAll() {
-    return await this.auditLogRepository.find();
+    return await this.auditLogRepository.find({
+      relations: ['user'],
+    });
   }
 
   async findOne(id: number) {
