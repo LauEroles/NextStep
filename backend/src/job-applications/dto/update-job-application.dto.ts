@@ -1,4 +1,7 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateJobApplicationDto } from './create-job-application.dto';
+import { IsNumber, IsNotEmpty } from 'class-validator';
 
-export class UpdateJobApplicationDto extends PartialType(CreateJobApplicationDto) {}
+export class UpdateJobApplicationDto {
+  @IsNotEmpty({ message: 'El ID de la etapa es obligatorio.' })
+  @IsNumber({}, { message: 'El ID de la etapa debe ser un número válido.' })
+  stageId: number;
+}

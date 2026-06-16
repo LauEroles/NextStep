@@ -3,26 +3,45 @@
 entity "users" as users {
   * id : number <<PK>>
   --
-  * email : VARCHAR(255)
-  * password : VARCHAR(255)
+  * role_id : number <<FK>>
+  * email : VARCHAR(255) <<UNIQUE>>
+  * password_hash : VARCHAR(255)
   * first_name : VARCHAR(100)
   * last_name : VARCHAR(100)
-  * role : ENUM(ADMIN, RECRUITER, APPLICANT)
   created_at : TIMESTAMP
   updated_at : TIMESTAMP
+}
+
+entity "roles" as roles {
+  * id : number <<PK>>
+  --
+  * name : VARCHAR(50) <<UNIQUE>>
+}
+
+entity "seniorities" as seniorities {
+  * id : number <<PK>>
+  --
+  * name : VARCHAR(50) <<UNIQUE>>
 }
 
 entity "job_offers" as job_offers {
   * id : number <<PK>>
   --
   * recruiter_id : number <<FK>>
+  * seniority_id : number <<FK>>
   * title : VARCHAR(255)
   * description : TEXT
-  * seniority : ENUM(JUNIOR, SEMI_SENIOR, SENIOR)
-  * skills_required : VARCHAR(500)
-  * status : ENUM(ACTIVE, INACTIVE)
+  * is_active : BOOLEAN
   created_at : TIMESTAMP
   updated_at : TIMESTAMP
+}
+
+entity "stages" as stages {
+  * id : number <<PK>>
+  --
+  * name : VARCHAR(100) <<UNIQUE>>
+  * sequence_order : INT <<UNIQUE>>
+  * is_terminal : BOOLEAN
 }
 
 entity "applications" as applications {
@@ -30,18 +49,19 @@ entity "applications" as applications {
   --
   * applicant_id : number <<FK>>
   * job_offer_id : number <<FK>>
-  * status : ENUM(APPLIED, IN_REVIEW, INTERVIEW, DESESTIMATED, APPROVED, OFFER)
+  * current_stage_id : number <<FK>>
   applied_at : TIMESTAMP
   updated_at : TIMESTAMP
 }
 
-entity "feedback" as feedback {
+entity "feedbacks" as feedbacks {
   * id : number <<PK>>
   --
   * application_id : number <<FK>>
+  * stage_id : number <<FK>>
   * recruiter_id : number <<FK>>
-  * technical_score : INT
-  * soft_skills_score : INT
+  technical_score : INT
+  soft_skills_score : INT
   * comment : TEXT
   created_at : TIMESTAMP
 }
@@ -49,18 +69,34 @@ entity "feedback" as feedback {
 entity "audit_logs" as audit_logs {
   * id : number <<PK>>
   --
-  * user_id : number <<FK>>
+  user_email : number <<FK>>
   * action : VARCHAR(100)
-  * entity : VARCHAR(100)
-  entity_id : VARCHAR(255)
+  * table_name : VARCHAR(100)
+  record_id : VARCHAR(255)
   metadata : JSONB
   created_at : TIMESTAMP
 }
 
-users          ||--o{ job_offers   : "crea"
-users          ||--o{ applications : "se postula"
-job_offers     ||--o{ applications : "recibe"
-applications   ||--o| feedback     : "tiene"
-users          ||--o{ audit_logs   : "genera"
+' Relación de Usuarios y Roles (1 a Muchos)
+roles ||--o{ users : "define el perfil de"
+
+' Relaciones de Ofertas y Skills/Seniority
+users ||--o{ job_offers : "crea (recruiter)"
+seniorities ||--o{ job_offers : "categoriza"
+job_offers ||--o{ job_offer_skills : "requiere"
+skills ||--o{ job_offer_skills : "pertenece a"
+
+' Relaciones de Postulaciones y Etapas
+users ||--o{ applications : "se postula (applicant)"
+job_offers ||--o{ applications : "recibe"
+stages ||--o{ applications : "marca el estado actual de"
+
+' Relaciones de Feedback
+applications ||--o{ feedbacks : "tiene"
+stages ||--o{ feedbacks : "identifica el momento del"
+users ||--o{ feedbacks : "escribe (recruiter)"
+
+' Relaciones de Auditoría
+users ||--o{ audit_logs : "genera"
 
 @enduml

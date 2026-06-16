@@ -1,15 +1,34 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { JobOffersService } from './job-offers.service';
 import { CreateJobOfferDto } from './dto/create-job-offer.dto';
 import { UpdateJobOfferDto } from './dto/update-job-offer.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import type { ActiveUser } from '../auth/interfaces/active-user.interface';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('job-offers')
 export class JobOffersController {
   constructor(private readonly jobOffersService: JobOffersService) {}
 
+  @Roles('recruiter')
   @Post()
-  create(@Body() createJobOfferDto: CreateJobOfferDto) {
-    return this.jobOffersService.create(createJobOfferDto);
+  create(
+    @Body() createJobOfferDto: CreateJobOfferDto,
+    @CurrentUser() currentUser: ActiveUser,
+  ) {
+    return this.jobOffersService.create(createJobOfferDto, currentUser.id);
   }
 
   @Get()
@@ -22,11 +41,16 @@ export class JobOffersController {
     return this.jobOffersService.findOne(+id);
   }
 
+  @Roles('recruiter', 'admin')
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateJobOfferDto: UpdateJobOfferDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateJobOfferDto: UpdateJobOfferDto,
+  ) {
     return this.jobOffersService.update(+id, updateJobOfferDto);
   }
 
+  @Roles('admin', 'recruiter')
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.jobOffersService.remove(+id);

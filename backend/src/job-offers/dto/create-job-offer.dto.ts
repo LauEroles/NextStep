@@ -1,41 +1,17 @@
-import {
-  IsString,
-  IsNotEmpty,
-  IsEnum,
-  IsOptional,
-  MaxLength,
-  IsNumber,
-} from 'class-validator';
-import { Seniority } from '../enums/seniority.enum';
-import { JobOfferStatus } from '../enums/job-offers.enum';
-
+import { IsString, IsNotEmpty, MaxLength, IsNumber } from 'class-validator';
 
 export class CreateJobOfferDto {
   @IsString({ message: 'El título debe ser un texto válido' })
   @IsNotEmpty({ message: 'El título es obligatorio' })
-  @MaxLength(255, { message: 'El título no puede tener más de 255 caracteres' })
+  @MaxLength(50, { message: 'El título no puede tener más de 50 caracteres' })
   title: string;
 
   @IsString({ message: 'La descripción debe ser un texto válido' })
   @IsNotEmpty({ message: 'La descripción es obligatoria' })
+  @MaxLength(2000, { message: 'La descripción no puede tener más de 2000 caracteres' })
   description: string;
 
-  @IsEnum(Seniority, { message: 'El seniority especificado no es válido' })
-  @IsNotEmpty({ message: 'El seniority es obligatorio' })
-  seniority: Seniority;
-
-  @IsString({ message: 'Las skills deben ser un texto válido' })
-  @IsNotEmpty({ message: 'Las skills requeridas son obligatorias' })
-  @MaxLength(500, { message: 'Las skills no pueden tener más de 500 caracteres' })
-  skills_required: string;
-
-  @IsEnum(JobOfferStatus, { message: 'El estado especificado no es válido' })
-  @IsOptional()
-  status?: JobOfferStatus;
-
-  @IsNumber({}, { message: 'El recruiter_id debe ser un número' })
-  @IsNotEmpty({ message: 'El recruiter_id es obligatorio' })
-  recruiter_id: number;
+  @IsNumber({}, { message: 'El ID de seniority debe ser un número válido' })
+  @IsNotEmpty({ message: 'El ID de seniority es obligatorio' })
+  seniorityId: number;
 }
-
-
