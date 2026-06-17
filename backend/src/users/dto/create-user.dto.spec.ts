@@ -3,15 +3,16 @@ import { CreateUserDto } from "./create-user.dto";
 import { ValidationError, validate } from 'class-validator';
 import { describe, it, expect , beforeEach } from '@jest/globals';
 describe("create-userDto", () => {
-    it("should be valid with correct data", async() => {
+    it("verifico que el el objeto se cree de forma correcta ingresando los datos", async() => {
         const dto:CreateUserDto = new CreateUserDto();
-        dto.first_name= "Jose";
-        dto.last_name="peña";
+        dto.firstName= "Jose";
+        dto.lastName="peña";
         dto.email="Jose@gmail.com";
         dto.password="12345678";
-        dto.role_name = "applicant";
-        dto.birth_date = "2000-04-27";
+        dto.roleName = "applicant";
+        dto.birthDate = "2000-04-27";
         const errors: ValidationError[] = await validate(dto);
         expect(errors.length).toBe(0);
     });
+
 })
