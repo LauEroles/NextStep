@@ -14,6 +14,9 @@ import { SeniorityModule } from './seniority/seniority.module';
 import { AuditLogsModule } from './audit-logs/audit-logs.module';
 import { ScorecardsModule } from './scorecards/scorecards.module';
 import { CvModule } from './cv/cv.module';
+import { AuditLogsInterceptor } from './audit-logs/audit-logs.interceptor';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -41,8 +44,15 @@ import { CvModule } from './cv/cv.module';
     AuditLogsModule,
     ScorecardsModule,
     CvModule,
+    JwtModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: AuditLogsInterceptor,
+    },
+
+  ],
 })
-export class AppModule {}
+export class AppModule { }
