@@ -64,3 +64,73 @@ Puede:
 
 - Gestionar usuarios  
 - Acceso a historial de logs  
+
+---
+## Guía de instalación y ejecución
+
+- Plataforma de gestión de postulaciones laborales desarrollada para Programación III (UTN).
+- Stack: Next.js 16 + TypeScript + Tailwind CSS (frontend) | NestJS + TypeORM + PostgreSQL/Supabase (backend)
+
+### Repositorios
+
+| Repositorio | URL |
+| :--- | :--- |
+| Backend (API) | https://github.com/LauEroles/NextStep |
+| Frontend (App) | https://github.com/FloritoM/NextStep_TP |
+
+Cada repositorio se instala y corre de forma independiente. Se necesitan dos terminales abiertas para correr el proyecto completo.
+
+### Requisitos previos
+
+- Node.js v18 o superior
+- npm v9 o superior
+- Git
+
+### Backend
+
+1.1 Clonar el repositorio
+
+bashgit clone https://github.com/LauEroles/NextStep.git
+cd NextStep/backend
+
+1.2 Instalar dependencias
+
+bashnpm install
+
+1.3 Variables de entorno
+
+Crear el archivo .env dentro de la carpeta backend/ con el siguiente contenido:
+
+env# Base de datos (Supabase — usar Session Pooler, NO Direct Connection)
+DATABASE_URL=postgresql://postgres.[PROJECT_REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres
+
+# JWT
+JWT_SECRET=tu_secreto_jwt_aqui
+JWT_EXPIRES_IN=8h
+
+# Puerto
+PORT=3001
+
+
+Importante: La URL de Supabase debe ser la del Session Pooler (no la Direct Connection). Algunas redes bloquean el puerto directo de Postgres.
+
+
+1.4 Levantar el backend
+
+bashnpm run start:dev
+
+El servidor queda disponible en http://localhost:3001
+
+1.5 Dependencias principales
+
+| Paquete | Uso |
+| :--- | :--- |
+| @nestjs/core | Framework principal |
+| @nestjs/jwt | Autenticación JWT |
+| @nestjs/passport | Estrategias de autenticación |
+| typeorm + @nestjs/typeorm | ORM para PostgreSQL |
+| bcrypt | Hash de contraseñas |
+| multer | Subida de archivos (CVs) |
+| @nestjs/config | Variables de entorno |
+| class-validator | Validación de DTOs |
+| helmet| Seguridad HTTP headers |

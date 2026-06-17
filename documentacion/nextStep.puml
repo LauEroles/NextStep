@@ -3,6 +3,8 @@
 class Role {
   + id : number
   + name : string
+  + isDefault : boolean
+
 }
 
 class User {
@@ -43,10 +45,13 @@ class Stage {
   + id : number
   + name : string
   + sequenceOrder : number
+  + isTerminal : boolean
+
 }
 
 class Application {
   + id : number
+  + cvPath : string
   + appliedAt : Date
   + updatedAt : Date
   + applicant : User
@@ -60,9 +65,32 @@ class Feedback {
   + technicalScore : number | null
   + softSkillsScore : number | null
   + comment : string
+  + internalNotes : string
+  + publicFeedback : string
   + createdAt : Date
   + application : Application
+  + recruiter : User
+  + scorecards : Scorecard[]
   + stage : Stage
+}
+
+class Scorecard {
+  + id : number
+  + skillName : string
+  + score : number
+  + type : string
+  + createdAt : Date
+  + feedback : Feedback
+}
+
+class CvFile {
+  + id : UUID
+  + originalName : string
+  + storedName : string
+  + extension : string
+  + directory : string
+  + createdAt : Date
+  + user : User
 }
 
 class AuditLog {
@@ -88,6 +116,8 @@ Application "many" --> "1" Stage
 Application "1" *-- "many" Feedback
 Feedback "many" --> "1" Stage
 Feedback "many" --> "1" User
+
+CvFile "many" --> "1" User
 
 AuditLog "many" --> "1" User
 
