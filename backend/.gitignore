@@ -56,3 +56,7 @@ pids
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 uploads/*
+
+#Devolucion touch point TP progra 3.rtf
+
+.DS_Store

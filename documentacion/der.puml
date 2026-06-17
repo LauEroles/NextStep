@@ -63,6 +63,8 @@ entity "feedbacks" as feedbacks {
   technical_score : INT
   soft_skills_score : INT
   * comment : TEXT
+  internal_notes : TEXT
+  public_feedback : TEXT
   created_at : TIMESTAMP
 }
 
@@ -74,6 +76,27 @@ entity "audit_logs" as audit_logs {
   * table_name : VARCHAR(100)
   record_id : VARCHAR(255)
   metadata : JSONB
+  created_at : TIMESTAMP
+}
+
+entity "scorecards" as scorecards {
+  * id : number <<PK>>
+  --
+  * feedback_id : number <<FK>>
+  * skill_name : VARCHAR(255)
+  * score : INT
+  * type : ENUM(technical, soft)
+  created_at : TIMESTAMP
+}
+
+entity "cv_files" as cv_files {
+  * id : UUID <<PK>>
+  --
+  * user_id : number <<FK>>
+  * original_name : VARCHAR(255)
+  * stored_name : VARCHAR(255)
+  * extension : VARCHAR(10)
+  * directory : VARCHAR(255)
   created_at : TIMESTAMP
 }
 
@@ -98,5 +121,11 @@ users ||--o{ feedbacks : "escribe (recruiter)"
 
 ' Relaciones de Auditoría
 users ||--o{ audit_logs : "genera"
+
+' Scorecards
+feedback ||--o{ scorecards : "contiene"
+
+' CVs
+users ||--o{ cv_files : "sube"
 
 @enduml
