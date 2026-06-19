@@ -29,14 +29,14 @@ async function bootstrap() {
     prefix: '/uploads',
   });
 
-  const config = new DocumentBuilder()
-    .setTitle('NextStep API')
-    .setDescription('Documentación oficial del backend de NextStep')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
-
   if (process.env.NODE_ENV !== 'production') {
+    const config = new DocumentBuilder()
+      .setTitle('NextStep API')
+      .setDescription('Documentación oficial del backend de NextStep')
+      .setVersion('1.0')
+      .addBearerAuth()
+      .build();
+
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api-docs', app, document);
   }
@@ -44,4 +44,8 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 3001);
 }
 
-bootstrap();
+bootstrap().catch((err: unknown) => {
+  const error = err as Error;
+  console.error('Error crítico al inicializar la aplicación:', error.message);
+  process.exit(1);
+});
