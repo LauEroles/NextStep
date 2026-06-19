@@ -10,29 +10,41 @@ export class FeedbackService {
   constructor(
     @InjectRepository(Feedback)
     private readonly feedbackRepository: Repository<Feedback>,
-  ) {}
+  ) { }
 
   async create(createFeedbackDto: CreateFeedbackDto, recruiterId: number) {
-  const feedback = this.feedbackRepository.create({
-    comment: createFeedbackDto.comment,
-    technicalScore: createFeedbackDto.technicalScore,
-    softSkillsScore: createFeedbackDto.softSkillsScore,
-    internalNotes: createFeedbackDto.internalNotes,
-    publicFeedback: createFeedbackDto.publicFeedback,
-    application: { id: createFeedbackDto.application_id },
-    stage: { id: createFeedbackDto.stage_id },
-    recruiter: { id: recruiterId },
+    const feedback = this.feedbackRepository.create({
+      comment: createFeedbackDto.comment,
+      technicalScore: createFeedbackDto.technicalScore,
+      softSkillsScore: createFeedbackDto.softSkillsScore,
+      internalNotes: createFeedbackDto.internalNotes,
+      publicFeedback: createFeedbackDto.publicFeedback,
+      application: { id: createFeedbackDto.application_id },
+      stage: { id: createFeedbackDto.stage_id },
+      recruiter: { id: recruiterId },
     });
-  return await this.feedbackRepository.save(feedback);
+    return await this.feedbackRepository.save(feedback);
   }
 
   async findByApplication(applicationId: number) {
-  return await this.feedbackRepository.find({
-    where: { application: { id: applicationId } },
-    relations: ['application', 'stage', 'recruiter'],
-    order: { stage: { sequenceOrder: 'ASC' } },
+    return await this.feedbackRepository.find({
+      where: { application: { id: applicationId } },
+      relations: ['application', 'stage', 'recruiter'],
+      order: { stage: { sequenceOrder: 'ASC' } },
     });
   }
+
+  async findByApplicationForUser(applicationId: number, userId: number) {
+    return await this.feedbackRepository.find({
+      where: {
+        application: { id: applicationId, applicant: { id: userId } },
+      },
+      relations: ['application', 'stage', 'recruiter'],
+      order: { stage: { sequenceOrder: 'ASC' } },
+    });
+  }
+
+
   async findAll() {
     return await this.feedbackRepository.find({
       relations: ['application', 'stage', 'recruiter'],
