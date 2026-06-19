@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { JobOffersService } from './job-offers.service';
 import { CreateJobOfferDto } from './dto/create-job-offer.dto';
 import { UpdateJobOfferDto } from './dto/update-job-offer.dto';
@@ -17,6 +18,8 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import type { ActiveUser } from '../auth/interfaces/active-user.interface';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
+@ApiTags('Vacantes Laborales')
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('job-offers')
 export class JobOffersController {
@@ -24,6 +27,7 @@ export class JobOffersController {
 
   @Roles('recruiter')
   @Post()
+  @ApiOperation({ summary: 'Publicar una vacante laboral (Reclutadores)' })
   create(
     @Body() createJobOfferDto: CreateJobOfferDto,
     @CurrentUser() currentUser: ActiveUser,
@@ -32,17 +36,20 @@ export class JobOffersController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'Obtener el listado completo de vacantes' })
   findAll() {
     return this.jobOffersService.findAll();
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Obtener el detalle de una vacante por ID' })
   findOne(@Param('id') id: string) {
     return this.jobOffersService.findOne(+id);
   }
 
   @Roles('recruiter', 'admin')
   @Patch(':id')
+  @ApiOperation({ summary: 'Modificar los datos de una vacante existente' })
   update(
     @Param('id') id: string,
     @Body() updateJobOfferDto: UpdateJobOfferDto,
@@ -52,6 +59,7 @@ export class JobOffersController {
 
   @Roles('admin', 'recruiter')
   @Delete(':id')
+  @ApiOperation({ summary: 'Eliminar una vacante' })
   remove(@Param('id') id: string) {
     return this.jobOffersService.remove(+id);
   }
