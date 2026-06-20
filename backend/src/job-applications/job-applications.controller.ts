@@ -48,7 +48,7 @@ export class JobApplicationsController {
   @Roles('admin', 'recruiter', 'applicant')
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.jobApplicationsService.findOne(+id);
+    return this.jobApplicationsService.findOne(+id,['applicant', 'jobOffer', 'currentStage']);
   }
 
   @Roles('recruiter')
