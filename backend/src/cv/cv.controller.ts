@@ -1,7 +1,7 @@
 import {
   Controller, Post, Get, Param,
   UploadedFile, UseInterceptors, Body,
-  UseGuards
+  UseGuards, 
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CvService } from './cv.service';
@@ -22,6 +22,11 @@ export class CvController {
       message: 'CV subido correctamente',
       data: saved,
     };
+  }
+
+  @Get('user/:userId/latest')
+  async getLatest(@Param('userId') userId: number) {
+    return this.cvService.getLatestCvByUser(userId);
   }
 
   @Get('user/:userId')

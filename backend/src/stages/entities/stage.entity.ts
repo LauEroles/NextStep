@@ -13,4 +13,7 @@ export class Stage {
 
   @Column({ type: 'boolean', name: 'is_terminal' })
   isTerminal: boolean;
+
+  @Column({ type: 'boolean', name: 'is_hired_stage', default: false })
+  isHiredStage: boolean;
 }
