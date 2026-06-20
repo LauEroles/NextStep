@@ -11,18 +11,23 @@ import { JobApplication } from './entities/job-application.entity';
 import { JobOffersService } from '../job-offers/job-offers.service';
 import { StagesService } from '../stages/stages.service';
 import { ApplicationFactory } from './factories/application.factory';
-
+import { Feedback } from '../feedback/entities/feedback.entity';
 
 @Injectable()
 export class JobApplicationsService {
+  
   constructor(
-    @InjectRepository(JobApplication)
-    private readonly applicationRepo: Repository<JobApplication>,
-    private readonly jobOffersService: JobOffersService,
-    private readonly stagesService: StagesService,
-    private readonly applicationFactory: ApplicationFactory,
+  
+  @InjectRepository(JobApplication)
+  private readonly applicationRepo: Repository<JobApplication>,
 
-  ) {}
+  @InjectRepository(Feedback)
+  private readonly feedbackRepo: Repository<Feedback>,
+  private readonly jobOffersService: JobOffersService,
+  private readonly stagesService: StagesService,
+  private readonly applicationFactory: ApplicationFactory,
+) {}
+
 
   async create(
     createJobApplicationDto: CreateJobApplicationDto,
@@ -97,6 +102,23 @@ export class JobApplicationsService {
         'No se puede cambiar la etapa de una postulación que ya ha finalizado.',
       );
     }
+
+    if (targetStage.isHiredStage) {
+      const feedbacks = await this.feedbackRepo.find({
+        where: { application: { id } },
+      });
+
+      const distinctStageIds = new Set(
+        feedbacks.map((fb) => fb.stage?.id).filter(Boolean),
+      );
+
+      if (distinctStageIds.size < 2) {
+        throw new BadRequestException(
+          'No se puede contratar a un candidato sin al menos 2 feedbacks de etapas distintas.',
+        );
+      }
+    }
+
     application.currentStage = targetStage;
     return await this.applicationRepo.save(application);
   }
