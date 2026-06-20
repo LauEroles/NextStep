@@ -67,11 +67,21 @@ export class JobApplicationsController {
     return this.jobApplicationsService.findAll();
   }
 
+  @Roles('applicant')
+  @Get('my-applications')
+  findMyApplications(@CurrentUser() currentUser: ActiveUser) {
+    return this.jobApplicationsService.findByApplicant(currentUser.id);
+  }
+
   @Roles('admin', 'recruiter', 'applicant')
   @Get(':id')
   @ApiOperation({ summary: 'Obtener el detalle de una postulación por ID' })
   findOne(@Param('id') id: string) {
-    return this.jobApplicationsService.findOne(+id);
+    return this.jobApplicationsService.findOne(+id, [
+      'applicant',
+      'jobOffer',
+      'currentStage',
+    ]);
   }
 
   @Roles('recruiter')

@@ -29,7 +29,7 @@ import type { ActiveUser } from '../auth/interfaces/active-user.interface';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('feedback')
 export class FeedbackController {
-  constructor(private readonly feedbackService: FeedbackService) {}
+  constructor(private readonly feedbackService: FeedbackService) { }
 
   @Roles('recruiter')
   @Post()
@@ -43,7 +43,7 @@ export class FeedbackController {
     return this.feedbackService.create(createFeedbackDto, currentUser.id);
   }
 
-  @Roles('admin', 'recruiter')
+  @Roles('admin', 'recruiter', 'applicant')
   @Get()
   @ApiOperation({
     summary: 'Listar feedbacks, opcionalmente filtrados por postulación',
@@ -59,6 +59,15 @@ export class FeedbackController {
       return this.feedbackService.findByApplication(+applicationId);
     }
     return this.feedbackService.findAll();
+  }
+
+  @Roles('applicant')
+  @Get('my-feedback')
+  findMyFeedback(
+    @Query('applicationId') applicationId: string,
+    @CurrentUser() currentUser: ActiveUser,
+  ) {
+    return this.feedbackService.findByApplicationForUser(+applicationId, currentUser.id);
   }
 
   @Roles('admin', 'recruiter', 'applicant')

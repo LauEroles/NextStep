@@ -52,21 +52,27 @@ export class CvController {
       required: ['file', 'userId'],
     },
   })
-  async upload(
+  upload(
     @UploadedFile() file: Express.Multer.File,
     @Body('userId') userId: number,
   ) {
-    const saved = await this.cvService.uploadCv(file, userId);
+    const saved = this.cvService.uploadCv(file, userId);
     return {
       message: 'CV subido correctamente',
       data: saved,
     };
   }
 
-  @Roles('recruiter', 'applicant')
+  @Roles('admin', 'recruiter', 'applicant') 
+  @Get('user/:userId/latest')
+  getLatest(@Param('userId') userId: number) {
+    return this.cvService.getLatestCvByUser(userId);
+  }
+
+  @Roles('admin', 'recruiter', 'applicant')
   @Get('user/:userId')
   @ApiOperation({ summary: 'Obtener los CVs asociados a un usuario' })
-  async getByUser(@Param('userId') userId: number) {
+  getByUser(@Param('userId') userId: number) {
     return this.cvService.getCvsByUser(userId);
   }
 }
