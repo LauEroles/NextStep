@@ -14,16 +14,17 @@ import { multerConfig } from './multer.config';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
+import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import {
-  ApiBearerAuth,
-  ApiBody,
-  ApiConsumes,
-  ApiOperation,
-  ApiTags,
-} from '@nestjs/swagger';
+  ApiServerErrorDocs,
+  ApiAuthDocs,
+  ApiRolesDocs,
+} from '../common/decorators/api-docs.decorator';
 
 @ApiTags('Currículums (CV)')
-@ApiBearerAuth()
+@ApiServerErrorDocs()
+@ApiAuthDocs()
+@ApiRolesDocs()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('cv')
 export class CvController {

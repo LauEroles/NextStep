@@ -8,16 +8,23 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { StagesService } from './stages.service';
 import { CreateStageDto } from './dto/create-stage.dto';
 import { UpdateStageDto } from './dto/update-stage.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
+import {
+  ApiAuthDocs,
+  ApiRolesDocs,
+  ApiServerErrorDocs,
+} from '../common/decorators/api-docs.decorator';
 
 @ApiTags('Etapas de Selección')
-@ApiBearerAuth()
+@ApiServerErrorDocs()
+@ApiAuthDocs()
+@ApiRolesDocs()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('stages')
 export class StagesController {

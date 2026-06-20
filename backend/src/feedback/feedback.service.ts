@@ -10,7 +10,7 @@ export class FeedbackService {
   constructor(
     @InjectRepository(Feedback)
     private readonly feedbackRepository: Repository<Feedback>,
-  ) { }
+  ) {}
 
   async create(createFeedbackDto: CreateFeedbackDto, recruiterId: number) {
     const feedback = this.feedbackRepository.create({
@@ -43,7 +43,6 @@ export class FeedbackService {
       order: { stage: { sequenceOrder: 'ASC' } },
     });
   }
-
 
   async findAll() {
     return await this.feedbackRepository.find({

@@ -3,10 +3,17 @@ import { AuditLogsService } from './audit-logs.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiServerErrorDocs,
+  ApiAuthDocs,
+  ApiRolesDocs,
+} from '../common/decorators/api-docs.decorator';
 
 @ApiTags('Auditoría')
-@ApiBearerAuth()
+@ApiServerErrorDocs()
+@ApiAuthDocs()
+@ApiRolesDocs()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('audit-logs')
 export class AuditLogsController {

@@ -1,13 +1,20 @@
 import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { SeniorityService } from './seniority.service';
 import { CreateSeniorityDto } from './dto/create-seniority.dto';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
+import {
+  ApiServerErrorDocs,
+  ApiAuthDocs,
+  ApiRolesDocs,
+} from '../common/decorators/api-docs.decorator';
 
 @ApiTags('Seniorities (Niveles de Experiencia)')
-@ApiBearerAuth()
+@ApiServerErrorDocs()
+@ApiAuthDocs()
+@ApiRolesDocs()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('seniority')
 export class SeniorityController {

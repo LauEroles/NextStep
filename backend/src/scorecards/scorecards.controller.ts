@@ -8,16 +8,23 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { ScorecardsService } from './scorecards.service';
 import { CreateScorecardDto } from './dto/create-scorecard.dto';
 import { UpdateScorecardDto } from './dto/update-scorecard.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
+import {
+  ApiServerErrorDocs,
+  ApiAuthDocs,
+  ApiRolesDocs,
+} from '../common/decorators/api-docs.decorator';
 
 @ApiTags('Scorecards (Evaluaciones)')
-@ApiBearerAuth()
+@ApiServerErrorDocs()
+@ApiAuthDocs()
+@ApiRolesDocs()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('scorecards')
 export class ScorecardsController {

@@ -9,12 +9,7 @@ import {
   UseGuards,
   Query,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiBearerAuth,
-  ApiQuery,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { FeedbackService } from './feedback.service';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { UpdateFeedbackDto } from './dto/update-feedback.dto';
@@ -23,13 +18,20 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import type { ActiveUser } from '../auth/interfaces/active-user.interface';
+import {
+  ApiServerErrorDocs,
+  ApiAuthDocs,
+  ApiRolesDocs,
+} from '../common/decorators/api-docs.decorator';
 
 @ApiTags('Feedbacks')
-@ApiBearerAuth()
+@ApiServerErrorDocs()
+@ApiAuthDocs()
+@ApiRolesDocs()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('feedback')
 export class FeedbackController {
-  constructor(private readonly feedbackService: FeedbackService) { }
+  constructor(private readonly feedbackService: FeedbackService) {}
 
   @Roles('recruiter')
   @Post()
@@ -43,7 +45,7 @@ export class FeedbackController {
     return this.feedbackService.create(createFeedbackDto, currentUser.id);
   }
 
-  @Roles('admin', 'recruiter', 'applicant')
+  @Roles('admin', 'recruiter')
   @Get()
   @ApiOperation({
     summary: 'Listar feedbacks, opcionalmente filtrados por postulación',
@@ -67,7 +69,10 @@ export class FeedbackController {
     @Query('applicationId') applicationId: string,
     @CurrentUser() currentUser: ActiveUser,
   ) {
-    return this.feedbackService.findByApplicationForUser(+applicationId, currentUser.id);
+    return this.feedbackService.findByApplicationForUser(
+      +applicationId,
+      currentUser.id,
+    );
   }
 
   @Roles('admin', 'recruiter', 'applicant')

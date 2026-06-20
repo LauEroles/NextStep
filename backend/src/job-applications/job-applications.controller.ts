@@ -9,12 +9,7 @@ import {
   UseGuards,
   Query,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiBearerAuth,
-  ApiQuery,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { JobApplicationsService } from './job-applications.service';
 import { CreateJobApplicationDto } from './dto/create-job-application.dto';
 import { UpdateJobApplicationDto } from './dto/update-job-application.dto';
@@ -23,9 +18,16 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import type { ActiveUser } from '../auth/interfaces/active-user.interface';
+import {
+  ApiServerErrorDocs,
+  ApiAuthDocs,
+  ApiRolesDocs,
+} from '../common/decorators/api-docs.decorator';
 
 @ApiTags('Postulaciones Laborales')
-@ApiBearerAuth()
+@ApiServerErrorDocs()
+@ApiAuthDocs()
+@ApiRolesDocs()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('job-applications')
 export class JobApplicationsController {
@@ -48,7 +50,7 @@ export class JobApplicationsController {
     );
   }
 
-  @Roles('admin', 'recruiter', 'applicant')
+  @Roles('admin', 'recruiter')
   @Get()
   @ApiOperation({
     summary:
@@ -73,7 +75,7 @@ export class JobApplicationsController {
     return this.jobApplicationsService.findByApplicant(currentUser.id);
   }
 
-  @Roles('admin', 'recruiter', 'applicant')
+  @Roles('admin', 'recruiter')
   @Get(':id')
   @ApiOperation({ summary: 'Obtener el detalle de una postulación por ID' })
   findOne(@Param('id') id: string) {

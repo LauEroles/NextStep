@@ -4,8 +4,10 @@ import { SignInDto } from './dto/signIn.dto';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { UsersService } from '../users/users.service';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiServerErrorDocs } from '../common/decorators/api-docs.decorator';
 
 @ApiTags('Autenticación')
+@ApiServerErrorDocs()
 @Controller('auth')
 export class AuthController {
   constructor(
