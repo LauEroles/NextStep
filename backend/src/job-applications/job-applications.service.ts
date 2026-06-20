@@ -105,4 +105,13 @@ export class JobApplicationsService {
     const application = await this.findOne(id);
     return await this.applicationRepo.remove(application);
   }
+
+
+  async findByApplicant(applicantId: number) {
+  return await this.applicationRepo.find({
+    where: { applicant: { id: applicantId } },
+    relations: ['jobOffer', 'currentStage'],
+    order: { createdAt: 'DESC' },
+  });
+}
 }

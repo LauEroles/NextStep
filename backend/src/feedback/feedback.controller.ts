@@ -22,7 +22,7 @@ import type { ActiveUser } from '../auth/interfaces/active-user.interface';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('feedback')
 export class FeedbackController {
-  constructor(private readonly feedbackService: FeedbackService) {}
+  constructor(private readonly feedbackService: FeedbackService) { }
 
   @Roles('recruiter')
   @Post()
@@ -34,7 +34,7 @@ export class FeedbackController {
   }
 
 
-  @Roles('admin', 'recruiter')
+  @Roles('admin', 'recruiter', 'applicant')
   @Get()
   findAll(@Query('applicationId') applicationId?: string) {
     if (applicationId) {
@@ -42,6 +42,17 @@ export class FeedbackController {
     }
     return this.feedbackService.findAll();
   }
+
+  @Roles('applicant')
+  @Get('my-feedback')
+  findMyFeedback(
+    @Query('applicationId') applicationId: string,
+    @CurrentUser() currentUser: ActiveUser,
+  ) {
+    return this.feedbackService.findByApplicationForUser(+applicationId, currentUser.id);
+  }
+
+
   @Roles('admin', 'recruiter', 'applicant')
   @Get(':id')
   findOne(@Param('id') id: string) {
