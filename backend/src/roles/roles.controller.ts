@@ -1,5 +1,10 @@
 import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { 
+  ApiTags, 
+  ApiOperation, 
+  ApiOkResponse, 
+  ApiCreatedResponse 
+} from '@nestjs/swagger';
 import { RolesService } from './roles.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -10,6 +15,7 @@ import {
   ApiAuthDocs,
   ApiRolesDocs,
 } from '../common/decorators/api-docs.decorator';
+import { Role } from './entities/role.entity';
 
 @ApiTags('Roles de Sistema')
 @ApiServerErrorDocs()
@@ -22,6 +28,10 @@ export class RolesController {
 
   @Roles('admin')
   @Post()
+  @ApiCreatedResponse({ 
+    description: 'El nuevo rol fue creado y registrado exitosamente en el sistema.',
+    type: Role 
+  })
   @ApiOperation({ summary: 'Registrar un nuevo rol en el sistema (Admin)' })
   create(@Body() createRoleDto: CreateRoleDto) {
     return this.rolesService.create(createRoleDto);
@@ -29,6 +39,10 @@ export class RolesController {
 
   @Roles('admin')
   @Get()
+  @ApiOkResponse({ 
+    description: 'Lista completa de los roles configurados en el sistema obtenida correctamente.',
+    type: [Role] 
+  })
   @ApiOperation({ summary: 'Listar todos los roles configurados (Admin)' })
   findAll() {
     return this.rolesService.findAll();
@@ -36,6 +50,10 @@ export class RolesController {
 
   @Roles('admin')
   @Get(':id')
+  @ApiOkResponse({ 
+    description: 'Detalle del rol solicitado obtenido correctamente.',
+    type: Role 
+  })
   @ApiOperation({ summary: 'Obtener el detalle de un rol específico (Admin)' })
   findOne(@Param('id') id: string) {
     return this.rolesService.findOne(+id);

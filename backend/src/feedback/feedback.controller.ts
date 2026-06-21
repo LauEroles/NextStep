@@ -9,7 +9,13 @@ import {
   UseGuards,
   Query,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
+import { 
+  ApiTags, 
+  ApiOperation, 
+  ApiQuery, 
+  ApiOkResponse, 
+  ApiCreatedResponse 
+} from '@nestjs/swagger';
 import { FeedbackService } from './feedback.service';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { UpdateFeedbackDto } from './dto/update-feedback.dto';
@@ -23,6 +29,7 @@ import {
   ApiAuthDocs,
   ApiRolesDocs,
 } from '../common/decorators/api-docs.decorator';
+import { Feedback } from './entities/feedback.entity';
 
 @ApiTags('Feedbacks')
 @ApiServerErrorDocs()
@@ -35,6 +42,10 @@ export class FeedbackController {
 
   @Roles('recruiter')
   @Post()
+  @ApiCreatedResponse({
+    description: 'El feedback fue registrado correctamente en el sistema.',
+    type: Feedback,
+  })
   @ApiOperation({
     summary: 'Registrar un nuevo feedback para una etapa (Reclutadores)',
   })
@@ -47,6 +58,10 @@ export class FeedbackController {
 
   @Roles('admin', 'recruiter')
   @Get()
+  @ApiOkResponse({
+    description: 'Listado global de feedbacks obtenido correctamente.',
+    type: [Feedback],
+  })
   @ApiOperation({
     summary: 'Listar feedbacks, opcionalmente filtrados por postulación',
   })
@@ -65,6 +80,19 @@ export class FeedbackController {
 
   @Roles('applicant')
   @Get('my-feedback')
+  @ApiOkResponse({
+    description: 'Listado de tus feedbacks personales para la postulación obtenido con éxito.',
+    type: [Feedback],
+  })
+  @ApiOperation({
+    summary: 'Listar los feedbacks del postulante actual para una postulación específica',
+  })
+  @ApiQuery({
+    name: 'applicationId',
+    required: true,
+    type: Number,
+    description: 'ID de la postulación para filtrar tus feedbacks',
+  })
   findMyFeedback(
     @Query('applicationId') applicationId: string,
     @CurrentUser() currentUser: ActiveUser,
@@ -77,6 +105,10 @@ export class FeedbackController {
 
   @Roles('admin', 'recruiter', 'applicant')
   @Get(':id')
+  @ApiOkResponse({
+    description: 'Detalle del feedback específico obtenido correctamente.',
+    type: Feedback,
+  })
   @ApiOperation({
     summary: 'Obtener el detalle de un feedback específico por ID',
   })
@@ -86,6 +118,10 @@ export class FeedbackController {
 
   @Roles('recruiter')
   @Patch(':id')
+  @ApiOkResponse({
+    description: 'El feedback especificado se modificó correctamente.',
+    type: Feedback,
+  })
   @ApiOperation({
     summary: 'Modificar un feedback existente (Reclutadores)',
   })
@@ -98,6 +134,9 @@ export class FeedbackController {
 
   @Roles('admin', 'recruiter')
   @Delete(':id')
+  @ApiOkResponse({
+    description: 'El feedback fue eliminado del sistema correctamente.',
+  })
   @ApiOperation({
     summary: 'Eliminar un feedback del sistema (Admin/Reclutadores)',
   })
