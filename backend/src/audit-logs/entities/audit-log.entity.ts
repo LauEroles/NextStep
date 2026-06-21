@@ -23,7 +23,7 @@ export class AuditLog {
   @Column({ type: 'varchar', length: 100 })
   entity: string;
 
-  @Column({ name: 'entity_id', nullable: true })
+  @Column({ name: 'entity_id', type: 'int', nullable: true })
   entityId: number | null;
 
   @CreateDateColumn({ name: 'created_at' })
