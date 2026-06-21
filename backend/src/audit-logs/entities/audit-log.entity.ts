@@ -23,9 +23,9 @@ export class AuditLog {
   @Column({ type: 'varchar', length: 100 })
   entity: string;
 
-  @Column({ type: 'varchar', length: 255 })
-  entity_id: string;
+  @Column({ name: 'entity_id' })
+  entityId: number;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 }

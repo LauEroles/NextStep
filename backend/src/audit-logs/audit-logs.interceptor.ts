@@ -50,9 +50,14 @@ export class AuditLogsInterceptor implements NestInterceptor {
                 if (request.url === '/auth/register') {
                     entity = 'User';
                 }
-                const entity_id = String(responseBody?.id ?? request.params?.id ?? '');
 
-                this.auditLogsService.create({ userId, action, entity, entity_id });
+            const rawId = responseBody?.id ?? request.params?.id;
+            const entityId = rawId !== undefined ? Number(rawId) : null;
+
+            // Si no pudimos determinar un id numérico válido, no logueamos
+            if (entityId === null || Number.isNaN(entityId)) return;
+
+                this.auditLogsService.create({ userId, action, entity, entityId});
             }),
         );
     }
