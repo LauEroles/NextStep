@@ -7,7 +7,7 @@ import { JobApplicationsModule } from '../job-applications/job-applications.modu
 import { StagesModule } from '../stages/stages.module';
 import { ScorecardsModule } from '../scorecards/scorecards.module';   
 import { CvModule } from '../cv/cv.module';                           
-import { GeminiService } from './gemini.service';  
+import { ClaudeService } from './claude.service';  
 
 @Module({
   imports: [
@@ -18,7 +18,7 @@ import { GeminiService } from './gemini.service';
     CvModule,
   ],
   controllers: [FeedbackController],
-  providers: [FeedbackService, GeminiService],
+  providers: [FeedbackService, ClaudeService],
   exports: [FeedbackService],
 })
 export class FeedbackModule {}

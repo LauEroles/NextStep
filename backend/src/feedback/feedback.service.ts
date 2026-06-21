@@ -6,7 +6,7 @@ import { UpdateFeedbackDto } from './dto/update-feedback.dto';
 import { Feedback } from './entities/feedback.entity';
 import { Scorecard } from '../scorecards/entities/scorecard.entity';
 import { JobApplication } from '../job-applications/entities/job-application.entity';
-import { GeminiService } from './gemini.service';
+import { ClaudeService } from './claude.service';
 import { CvService } from '../cv/cv.service';
 
 
@@ -19,7 +19,7 @@ export class FeedbackService {
     private readonly scorecardRepository: Repository<Scorecard>,
     @InjectRepository(JobApplication)
     private readonly applicationRepository: Repository<JobApplication>,
-    private readonly geminiService: GeminiService,
+    private readonly claudeService: ClaudeService,
     private readonly cvService: CvService,
   ) { }
 
@@ -122,11 +122,11 @@ export class FeedbackService {
       application.applicant.id,
     );
 
-    // 5. Armar el prompt para Gemini
+    // 5. Armar el prompt para Claude
     const prompt = this.buildPrompt(application, feedbacks, scorecards, cv);
 
-    // 6. Llamar a Gemini
-    const generatedText = await this.geminiService.generateFeedback(prompt);
+    // 6. Llamar a Claude
+    const generatedText = await this.claudeService.generateFeedback(prompt);
 
     // 7. Guardar el resultado en publicFeedback de TODOS los feedbacks de esa postulación
     for (const fb of feedbacks) {
