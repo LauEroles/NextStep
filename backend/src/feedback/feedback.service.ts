@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
@@ -26,6 +26,19 @@ export class FeedbackService {
 
 
   async create(createFeedbackDto: CreateFeedbackDto, recruiterId: number) {
+    const existing = await this.feedbackRepository.findOne({
+      where: {
+        application: { id: createFeedbackDto.application_id },
+        stage: { id: createFeedbackDto.stage_id },
+      },
+    });
+
+    if (existing) {
+      throw new BadRequestException(
+        'Ya existe un feedback para esta etapa. Editá el feedback existente en lugar de crear uno nuevo.',
+      );
+    }
+
     const feedback = this.feedbackRepository.create({
       comment: createFeedbackDto.comment,
       technicalScore: createFeedbackDto.technicalScore,
