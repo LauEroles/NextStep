@@ -20,7 +20,7 @@ export class UsersService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly rolesService: RolesService,
-  ) {}
+  ) { }
 
   async create(createUserDto: CreateUserDto) {
     const userExists = await this.findByEmail(createUserDto.email);
@@ -43,6 +43,7 @@ export class UsersService {
 
     const newUser = this.userRepository.create({
       ...userFields,
+      email: userFields.email.toLowerCase(),
       password: hashedPassword,
       role: userRole,
     });
@@ -98,6 +99,14 @@ export class UsersService {
       );
     }
     const user = await this.findOne(id);
+
+    if (updateUserDto.email && updateUserDto.email.toLowerCase() !== user.email.toLowerCase()) {
+      const emailExists = await this.findByEmail(updateUserDto.email);
+      if (emailExists) {
+        throw new ConflictException('El correo electrónico ya está registrado');
+      }
+    }
+
     if (updateUserDto.password) {
       updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
     }

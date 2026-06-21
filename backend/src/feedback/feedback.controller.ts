@@ -143,4 +143,12 @@ export class FeedbackController {
   remove(@Param('id') id: string) {
     return this.feedbackService.remove(+id);
   }
+
+  @Roles('recruiter')
+  @Post('generate/:applicationId')
+  generatePublicFeedback(@Param('applicationId') applicationId: string) {
+    return this.feedbackService.generatePublicFeedback(+applicationId);
+  }
+
+
 }
