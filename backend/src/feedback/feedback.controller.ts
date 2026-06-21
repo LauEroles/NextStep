@@ -75,10 +75,10 @@ export class FeedbackController {
   }
 
   @Roles('recruiter')
-  @Post('generate/:applicationId')
-  generatePublicFeedback(@Param('applicationId') applicationId: string) {
-    return this.feedbackService.generatePublicFeedback(+applicationId);
+  @Post(':id/generate')
+  generateFeedbackForOne(@Param('id') id: string) {
+    return this.feedbackService.generateFeedbackForOne(+id);
   }
-
+  
 
 }
