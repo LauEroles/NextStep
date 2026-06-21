@@ -8,6 +8,6 @@ import { Scorecard } from './entities/scorecard.entity';
   imports: [TypeOrmModule.forFeature([Scorecard])],
   controllers: [ScorecardsController],
   providers: [ScorecardsService],
-  exports: [ScorecardsService],
+  exports: [ScorecardsService, TypeOrmModule],
 })
 export class ScorecardsModule {}
