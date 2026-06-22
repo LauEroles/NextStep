@@ -101,6 +101,8 @@ Cree un archivo `.env` en la raíz de la carpeta backend basándose en el `.env.
 `PORT=3001`\
 `NODE_ENV=development`
 
+La variable `NODE_ENV=development` es fundamental para que la documentación interactiva de Swagger esté habilitada localmente. Al pasar a producción, se desactiva.
+
 **Base de datos (Supabase — usar Session Pooler, NO Direct Connection)**\
 `DATABASE_URL=postgresql://postgres.[PROJECT_REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres`
 
@@ -115,7 +117,10 @@ Cree un archivo `.env` en la raíz de la carpeta backend basándose en el `.env.
 `DEFAULT_ADMIN_EMAIL=admin@nextstep.com`\
 `DEFAULT_ADMIN_PASSWORD=Admin123`
 
-Importante: La variable `NODE_ENV=development` es fundamental para que la documentación interactiva de Swagger esté habilitada localmente. Al pasar a producción, se desactiva automáticamente.
+**Sincronización automática de entidades con la base de datos (TypeORM)**\
+`DB_SYNC=true`
+
+Al pasar a la etapa de producción, es fundamental cambiar la variable `DB_SYNC` a `false` y usar migraciones en vez de la sincronización automática.
 
 **3. Inicialización de la Base de Datos (Seed):**\
 El sistema requiere tablas maestras (Roles, Seniorities, Etapas) y un usuario inicial para funcionar. Ejecute el siguiente comando por única vez:
