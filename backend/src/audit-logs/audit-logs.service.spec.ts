@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { mock, MockProxy } from 'jest-mock-extended';
@@ -229,3 +230,5 @@ describe('AuditLogsService', () => {
     });
   });
 });
+=======
+>>>>>>> develop-back

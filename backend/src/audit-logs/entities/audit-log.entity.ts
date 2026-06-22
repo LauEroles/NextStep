@@ -1,34 +1,31 @@
 import {
-    Entity,
-    Column,
-    PrimaryGeneratedColumn,
-    CreateDateColumn,
-    ManyToOne,
-    JoinColumn,
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 
 @Entity('audit_logs')
 export class AuditLog {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @ManyToOne(() => User)
-    @JoinColumn({ name: 'user_id' })
-    user: User;
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'user_id' })
+  user: User;
 
-    @Column()
-    userId: number;
+  @Column({ type: 'varchar', length: 100 })
+  action: string;
 
-    @Column({ type: 'varchar', length: 100 })
-    action: string;
+  @Column({ type: 'varchar', length: 100 })
+  entity: string;
 
-    @Column({ type: 'varchar', length: 100 })
-    entity: string;
+  @Column({ name: 'entity_id', type: 'int', nullable: true })
+  entityId: number | null;
 
-    @Column({ type: 'varchar', length: 255 })
-    entity_id: string;
-
-    @CreateDateColumn()
-    createdAt: Date;
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
 }
