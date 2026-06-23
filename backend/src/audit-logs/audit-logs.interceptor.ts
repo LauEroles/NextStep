@@ -20,7 +20,6 @@ export class AuditLogsInterceptor implements NestInterceptor {
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
         const request = context.switchToHttp().getRequest();
 
-
         const action = METHOD_ACTION_MAP[request.method];
         if (request.url.includes('/auth/login')) {
             return next.handle();

@@ -23,8 +23,6 @@ export class FeedbackService {
     private readonly cvService: CvService,
   ) { }
 
-
-
   async create(createFeedbackDto: CreateFeedbackDto, recruiterId: number) {
     const existing = await this.feedbackRepository.findOne({
       where: {
@@ -69,7 +67,6 @@ export class FeedbackService {
       order: { stage: { sequenceOrder: 'ASC' } },
     });
   }
-
 
   async findAll() {
     return await this.feedbackRepository.find({

@@ -15,25 +15,21 @@ import { Feedback } from '../feedback/entities/feedback.entity';
 
 @Injectable()
 export class JobApplicationsService {
-  
   constructor(
-  
-  @InjectRepository(JobApplication)
-  private readonly applicationRepo: Repository<JobApplication>,
-
-  @InjectRepository(Feedback)
-  private readonly feedbackRepo: Repository<Feedback>,
-  private readonly jobOffersService: JobOffersService,
-  private readonly stagesService: StagesService,
-  private readonly applicationFactory: ApplicationFactory,
-) {}
-
+    @InjectRepository(JobApplication)
+    private readonly applicationRepo: Repository<JobApplication>,
+    @InjectRepository(Feedback)
+    private readonly feedbackRepo: Repository<Feedback>,
+    private readonly jobOffersService: JobOffersService,
+    private readonly stagesService: StagesService,
+    private readonly applicationFactory: ApplicationFactory,
+  ) {}
 
   async create(
     createJobApplicationDto: CreateJobApplicationDto,
     applicantId: number,
   ) {
-    const { jobOfferId, ...applicationData } = createJobApplicationDto;
+    const { jobOfferId, ..._applicationData } = createJobApplicationDto;
 
     const jobOffer = await this.jobOffersService.findOne(jobOfferId);
     if (!jobOffer) {
@@ -67,19 +63,18 @@ export class JobApplicationsService {
   }
 
   async findAll() {
-  return await this.applicationRepo.find({
-    relations: ['jobOffer', 'applicant', 'currentStage'],
+    return await this.applicationRepo.find({
+      relations: ['jobOffer', 'applicant', 'currentStage'],
     });
   }
 
   async findByJobOffer(jobOfferId: number) {
-  return await this.applicationRepo.find({
-    where: { jobOffer: { id: jobOfferId } },
-    relations: ['jobOffer', 'applicant', 'currentStage'],
-  });
-}
+    return await this.applicationRepo.find({
+      where: { jobOffer: { id: jobOfferId } },
+      relations: ['jobOffer', 'applicant', 'currentStage'],
+    });
+  }
 
-  
   async findOne(id: number, relations?: string[]) {
     const application = await this.applicationRepo.findOne({
       where: { id },
@@ -128,12 +123,11 @@ export class JobApplicationsService {
     return await this.applicationRepo.remove(application);
   }
 
-
   async findByApplicant(applicantId: number) {
-  return await this.applicationRepo.find({
-    where: { applicant: { id: applicantId } },
-    relations: ['jobOffer', 'currentStage'],
-    order: { createdAt: 'DESC' },
-  });
-}
+    return await this.applicationRepo.find({
+      where: { applicant: { id: applicantId } },
+      relations: ['jobOffer', 'currentStage'],
+      order: { createdAt: 'DESC' },
+    });
+  }
 }
