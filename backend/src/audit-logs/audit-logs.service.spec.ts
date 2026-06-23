@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { mock, MockProxy } from 'jest-mock-extended';
@@ -13,6 +12,7 @@ describe('AuditLogsService', () => {
   let service: AuditLogsService;
   let mockAuditLogRepository: MockProxy<Repository<AuditLog>>;
 
+  // ✅ Mocks reutilizables
   const userMock = mock<User>({
     id: 1,
     firstName: 'John',
@@ -24,20 +24,18 @@ describe('AuditLogsService', () => {
   const auditLogMock = mock<AuditLog>({
     id: 1,
     user: userMock,
-    userId: 1,
     action: 'CREATE',
     entity: 'JobOffer',
-    entity_id: '10',
+    entityId: 10,
     createdAt: new Date(),
   });
 
   const auditLogMock2 = mock<AuditLog>({
     id: 2,
     user: userMock,
-    userId: 1,
     action: 'DELETE',
     entity: 'User',
-    entity_id: '5',
+    entityId: 5,
     createdAt: new Date(),
   });
 
@@ -64,18 +62,23 @@ describe('AuditLogsService', () => {
     mockAuditLogRepository.save.mockReset();
   });
 
-
+  // ─────────────────────────────────────────
+  // SERVICE
+  // ─────────────────────────────────────────
   it('debería estar definido', () => {
     expect(service).toBeDefined();
   });
 
+  // ─────────────────────────────────────────
+  // CREATE
+  // ─────────────────────────────────────────
   describe('create', () => {
-    it('debería crear un log correctamente con todos los campos', async () => {
+    it('debería crear un log correctamente con userId definido', async () => {
       const createAuditLogDtoMock: CreateAuditLogDto = {
         userId: 1,
         action: 'CREATE',
         entity: 'JobOffer',
-        entityId: '10',
+        entityId: 10,
       };
 
       mockAuditLogRepository.create.mockReturnValue(auditLogMock);
@@ -83,25 +86,65 @@ describe('AuditLogsService', () => {
 
       const result = await service.create(createAuditLogDtoMock);
 
-      expect(mockAuditLogRepository.create).toHaveBeenCalledWith(createAuditLogDtoMock);
+      // ✅ Verificar que separa userId y lo transforma en relación { id: userId }
+      expect(mockAuditLogRepository.create).toHaveBeenCalledWith({
+        action: 'CREATE',
+        entity: 'JobOffer',
+        entityId: 10,
+        user: { id: 1 },
+      });
       expect(mockAuditLogRepository.save).toHaveBeenCalledWith(auditLogMock);
       expect(result).toEqual(auditLogMock);
     });
 
-    it('debería crear un log sin entityId ya que es opcional', async () => {
+    it('debería crear un log con user en null si userId es null', async () => {
       const createAuditLogDtoMock: CreateAuditLogDto = {
-        userId: 1,
+        userId: null,
         action: 'DELETE',
-        entity: 'User',
+        entity: 'System',
+        entityId: null,
       };
 
-      mockAuditLogRepository.create.mockReturnValue(auditLogMock2);
-      mockAuditLogRepository.save.mockResolvedValue(auditLogMock2);
+      const systemLogMock = mock<AuditLog>({
+        id: 3,
+        user: null,
+        action: 'DELETE',
+        entity: 'System',
+        entityId: null,
+        createdAt: new Date(),
+      });
+
+      mockAuditLogRepository.create.mockReturnValue(systemLogMock);
+      mockAuditLogRepository.save.mockResolvedValue(systemLogMock);
 
       const result = await service.create(createAuditLogDtoMock);
 
-      expect(mockAuditLogRepository.create).toHaveBeenCalledWith(createAuditLogDtoMock);
-      expect(result).toEqual(auditLogMock2);
+      // ✅ Verificar que user se pasa como null cuando userId es null
+      expect(mockAuditLogRepository.create).toHaveBeenCalledWith({
+        action: 'DELETE',
+        entity: 'System',
+        entityId: null,
+        user: null,
+      });
+      expect(result).toEqual(systemLogMock);
+    });
+
+    it('no debería incluir userId directamente en el objeto pasado a create', async () => {
+      const createAuditLogDtoMock: CreateAuditLogDto = {
+        userId: 5,
+        action: 'UPDATE',
+        entity: 'Role',
+        entityId: 2,
+      };
+
+      mockAuditLogRepository.create.mockReturnValue(auditLogMock);
+      mockAuditLogRepository.save.mockResolvedValue(auditLogMock);
+
+      await service.create(createAuditLogDtoMock);
+
+      const createCall = mockAuditLogRepository.create.mock.calls[0][0];
+      expect(createCall).not.toHaveProperty('userId');
+      expect(createCall).toHaveProperty('user', { id: 5 });
     });
 
     it('debería crear logs con distintas acciones', async () => {
@@ -112,7 +155,7 @@ describe('AuditLogsService', () => {
           userId: 1,
           action,
           entity: 'JobOffer',
-          entityId: '1',
+          entityId: 1,
         };
 
         mockAuditLogRepository.create.mockReturnValue(auditLogMock);
@@ -137,7 +180,7 @@ describe('AuditLogsService', () => {
           userId: 1,
           action: 'CREATE',
           entity,
-          entityId: '1',
+          entityId: 1,
         };
 
         mockAuditLogRepository.create.mockReturnValue(auditLogMock);
@@ -153,17 +196,50 @@ describe('AuditLogsService', () => {
         mockAuditLogRepository.save.mockReset();
       }
     });
+
+    it('debería crear un log con entityId en null', async () => {
+      const createAuditLogDtoMock: CreateAuditLogDto = {
+        userId: 1,
+        action: 'LOGIN',
+        entity: 'Auth',
+        entityId: null,
+      };
+
+      const loginLogMock = mock<AuditLog>({
+        id: 4,
+        user: userMock,
+        action: 'LOGIN',
+        entity: 'Auth',
+        entityId: null,
+        createdAt: new Date(),
+      });
+
+      mockAuditLogRepository.create.mockReturnValue(loginLogMock);
+      mockAuditLogRepository.save.mockResolvedValue(loginLogMock);
+
+      const result = await service.create(createAuditLogDtoMock);
+
+      expect(mockAuditLogRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({ entityId: null }),
+      );
+      expect(result.entityId).toBeNull();
+    });
   });
 
-
+  // ─────────────────────────────────────────
+  // FIND ALL
+  // ─────────────────────────────────────────
   describe('findAll', () => {
-    it('debería retornar todos los logs', async () => {
+    it('debería retornar todos los logs con la relación user', async () => {
       const auditLogsMock = [auditLogMock, auditLogMock2];
       mockAuditLogRepository.find.mockResolvedValue(auditLogsMock);
 
       const result = await service.findAll();
 
-      expect(mockAuditLogRepository.find).toHaveBeenCalled();
+      // ✅ Verificar que pide la relación 'user'
+      expect(mockAuditLogRepository.find).toHaveBeenCalledWith({
+        relations: ['user'],
+      });
       expect(result).toHaveLength(2);
       expect(result).toEqual(auditLogsMock);
     });
@@ -187,6 +263,9 @@ describe('AuditLogsService', () => {
     });
   });
 
+  // ─────────────────────────────────────────
+  // FIND ONE
+  // ─────────────────────────────────────────
   describe('findOne', () => {
     it('debería retornar un log por id', async () => {
       mockAuditLogRepository.findOneBy.mockResolvedValue(auditLogMock);
@@ -203,10 +282,9 @@ describe('AuditLogsService', () => {
       const result = await service.findOne(1);
 
       expect(result.id).toBe(1);
-      expect(result.userId).toBe(1);
       expect(result.action).toBe('CREATE');
       expect(result.entity).toBe('JobOffer');
-      expect(result.entity_id).toBe('10');
+      expect(result.entityId).toBe(10);
     });
 
     it('debería lanzar NotFoundException si el log no existe', async () => {
@@ -230,5 +308,3 @@ describe('AuditLogsService', () => {
     });
   });
 });
-=======
->>>>>>> develop-back
