@@ -96,7 +96,8 @@ export class FeedbackService {
     await this.feedbackRepository.remove(feedback);
     return { message: `Feedback #${id} eliminado correctamente` };
   }
-async generateFeedbackForOne(feedbackId: number) {
+
+  async generateFeedbackForOne(feedbackId: number) {
     const feedback = await this.feedbackRepository.findOne({
       where: { id: feedbackId },
       relations: [
