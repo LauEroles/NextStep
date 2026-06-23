@@ -21,29 +21,45 @@ import { UpdateJobApplicationDto } from './dto/update-job-application.dto';
 describe('JobApplicationsService', () => {
   let service: JobApplicationsService;
   let mockApplicationRepo: MockProxy<Repository<JobApplication>>;
+  let mockFeedbackRepo: MockProxy<Repository<Feedback>>;
   let mockJobOffersService: MockProxy<JobOffersService>;
   let mockStagesService: MockProxy<StagesService>;
   let mockApplicationFactory: MockProxy<ApplicationFactory>;
 
+  // ✅ Mocks reutilizables
   const stageMock = mock<Stage>({
     id: 1,
     name: 'Postulado',
     sequenceOrder: 1,
     isTerminal: false,
+    isHiredStage: false,
+  });
+
+  const interviewStageMock = mock<Stage>({
+    id: 2,
+    name: 'Entrevista',
+    sequenceOrder: 2,
+    isTerminal: false,
+    isHiredStage: false,
+  });
+
+  const hiredStageMock = mock<Stage>({
+    id: 3,
+    name: 'Contratado',
+    sequenceOrder: 3,
+    isTerminal: false,
+    isHiredStage: true,
   });
 
   const terminalStageMock = mock<Stage>({
-    id: 3,
+    id: 4,
     name: 'Finalizado',
-    sequenceOrder: 3,
+    sequenceOrder: 4,
     isTerminal: true,
+    isHiredStage: false,
   });
 
-  const allStagesMock = [
-    stageMock,
-    mock<Stage>({ id: 2, name: 'Entrevista', sequenceOrder: 2, isTerminal: false }),
-    terminalStageMock,
-  ];
+  const allStagesMock = [stageMock, interviewStageMock, hiredStageMock, terminalStageMock];
 
   const jobOfferMock = mock<JobOffer>({
     id: 1,
@@ -79,8 +95,19 @@ describe('JobApplicationsService', () => {
     updatedAt: new Date(),
   });
 
+  const feedbackStage1Mock = mock<Feedback>({
+    id: 1,
+    stage: stageMock,
+  });
+
+  const feedbackStage2Mock = mock<Feedback>({
+    id: 2,
+    stage: interviewStageMock,
+  });
+
   beforeAll(async () => {
     mockApplicationRepo = mock<Repository<JobApplication>>();
+    mockFeedbackRepo = mock<Repository<Feedback>>();
     mockJobOffersService = mock<JobOffersService>();
     mockStagesService = mock<StagesService>();
     mockApplicationFactory = mock<ApplicationFactory>();
@@ -91,6 +118,10 @@ describe('JobApplicationsService', () => {
         {
           provide: getRepositoryToken(JobApplication),
           useValue: mockApplicationRepo,
+        },
+        {
+          provide: getRepositoryToken(Feedback),
+          useValue: mockFeedbackRepo,
         },
         {
           provide: JobOffersService,
@@ -116,13 +147,13 @@ describe('JobApplicationsService', () => {
     mockApplicationRepo.create.mockReset();
     mockApplicationRepo.save.mockReset();
     mockApplicationRepo.remove.mockReset();
+    mockFeedbackRepo.find.mockReset();
     mockJobOffersService.findOne.mockReset();
     mockStagesService.findInitialStage.mockReset();
     mockStagesService.findAll.mockReset();
     mockStagesService.findOne.mockReset();
     mockApplicationFactory.create.mockReset();
   });
-
 
   it('debería estar definido', () => {
     expect(service).toBeDefined();
@@ -235,7 +266,6 @@ describe('JobApplicationsService', () => {
     });
   });
 
-
   describe('exists', () => {
     it('debería retornar true si la postulación existe', async () => {
       mockApplicationRepo.findOne.mockResolvedValue(applicationMock);
@@ -285,7 +315,6 @@ describe('JobApplicationsService', () => {
     });
   });
 
-
   describe('findByJobOffer', () => {
     it('debería retornar postulaciones por oferta de trabajo', async () => {
       const applicationsMock = [applicationMock, applicationMock2];
@@ -305,6 +334,31 @@ describe('JobApplicationsService', () => {
       mockApplicationRepo.find.mockResolvedValue([]);
 
       const result = await service.findByJobOffer(99);
+
+      expect(result).toEqual([]);
+    });
+  });
+
+
+  describe('findByApplicant', () => {
+    it('debería retornar postulaciones por applicantId con relaciones y orden DESC', async () => {
+      const applicationsMock = [applicationMock2, applicationMock];
+      mockApplicationRepo.find.mockResolvedValue(applicationsMock);
+
+      const result = await service.findByApplicant(1);
+
+      expect(mockApplicationRepo.find).toHaveBeenCalledWith({
+        where: { applicant: { id: 1 } },
+        relations: ['jobOffer', 'currentStage'],
+        order: { createdAt: 'DESC' },
+      });
+      expect(result).toEqual(applicationsMock);
+    });
+
+    it('debería retornar array vacío si el applicant no tiene postulaciones', async () => {
+      mockApplicationRepo.find.mockResolvedValue([]);
+
+      const result = await service.findByApplicant(99);
 
       expect(result).toEqual([]);
     });
@@ -349,31 +403,31 @@ describe('JobApplicationsService', () => {
     });
   });
 
+
   describe('update', () => {
-    it('debería actualizar la etapa de una postulación correctamente', async () => {
+    it('debería actualizar la etapa de una postulación correctamente (etapa no hiring)', async () => {
       const updateJobApplicationDtoMock = mock<UpdateJobApplicationDto>({
         stageId: 2,
       });
 
       const applicationWithStageMock = mock<JobApplication>({
         ...applicationMock,
-        currentStage: stageMock, 
+        currentStage: stageMock,
       });
 
       const updatedApplicationMock = mock<JobApplication>({
         ...applicationWithStageMock,
-        currentStage: mock<Stage>({ id: 2, name: 'Entrevista', isTerminal: false }),
+        currentStage: interviewStageMock,
       });
 
       mockApplicationRepo.findOne.mockResolvedValue(applicationWithStageMock);
-      mockStagesService.findOne.mockResolvedValue(
-        mock<Stage>({ id: 2, name: 'Entrevista', isTerminal: false }),
-      );
+      mockStagesService.findOne.mockResolvedValue(interviewStageMock);
       mockApplicationRepo.save.mockResolvedValue(updatedApplicationMock);
 
       const result = await service.update(1, updateJobApplicationDtoMock);
 
       expect(mockStagesService.findOne).toHaveBeenCalledWith(2);
+      expect(mockFeedbackRepo.find).not.toHaveBeenCalled();
       expect(mockApplicationRepo.save).toHaveBeenCalled();
       expect(result).toEqual(updatedApplicationMock);
     });
@@ -385,7 +439,7 @@ describe('JobApplicationsService', () => {
 
       const terminalApplicationMock = mock<JobApplication>({
         ...applicationMock,
-        currentStage: terminalStageMock, 
+        currentStage: terminalStageMock,
       });
 
       mockApplicationRepo.findOne.mockResolvedValue(terminalApplicationMock);
@@ -427,6 +481,142 @@ describe('JobApplicationsService', () => {
         .toThrow(NotFoundException);
 
       expect(mockApplicationRepo.save).not.toHaveBeenCalled();
+    });
+
+    it('debería permitir mover a etapa de contratación si hay 2+ feedbacks de etapas distintas', async () => {
+      const updateJobApplicationDtoMock = mock<UpdateJobApplicationDto>({
+        stageId: 3,
+      });
+
+      const applicationWithStageMock = mock<JobApplication>({
+        ...applicationMock,
+        currentStage: interviewStageMock,
+      });
+
+      const updatedApplicationMock = mock<JobApplication>({
+        ...applicationWithStageMock,
+        currentStage: hiredStageMock,
+      });
+
+      mockApplicationRepo.findOne.mockResolvedValue(applicationWithStageMock);
+      mockStagesService.findOne.mockResolvedValue(hiredStageMock);
+      mockFeedbackRepo.find.mockResolvedValue([feedbackStage1Mock, feedbackStage2Mock]);
+      mockApplicationRepo.save.mockResolvedValue(updatedApplicationMock);
+
+      const result = await service.update(1, updateJobApplicationDtoMock);
+
+      expect(mockFeedbackRepo.find).toHaveBeenCalledWith({
+        where: { application: { id: 1 } },
+      });
+      expect(mockApplicationRepo.save).toHaveBeenCalled();
+      expect(result.currentStage).toEqual(hiredStageMock);
+    });
+
+    it('debería lanzar BadRequestException si hay menos de 2 feedbacks de etapas distintas al contratar', async () => {
+      const updateJobApplicationDtoMock = mock<UpdateJobApplicationDto>({
+        stageId: 3,
+      });
+
+      const applicationWithStageMock = mock<JobApplication>({
+        ...applicationMock,
+        currentStage: interviewStageMock,
+      });
+
+      mockApplicationRepo.findOne.mockResolvedValue(applicationWithStageMock);
+      mockStagesService.findOne.mockResolvedValue(hiredStageMock);
+      // ✅ Solo 1 feedback (de una sola etapa)
+      mockFeedbackRepo.find.mockResolvedValue([feedbackStage1Mock]);
+
+      await expect(service.update(1, updateJobApplicationDtoMock))
+        .rejects
+        .toThrow(BadRequestException);
+
+      await expect(service.update(1, updateJobApplicationDtoMock))
+        .rejects
+        .toThrow('No se puede contratar a un candidato sin al menos 2 feedbacks de etapas distintas.');
+
+      expect(mockApplicationRepo.save).not.toHaveBeenCalled();
+    });
+
+    it('debería lanzar BadRequestException si no hay feedbacks al intentar contratar', async () => {
+      const updateJobApplicationDtoMock = mock<UpdateJobApplicationDto>({
+        stageId: 3,
+      });
+
+      const applicationWithStageMock = mock<JobApplication>({
+        ...applicationMock,
+        currentStage: interviewStageMock,
+      });
+
+      mockApplicationRepo.findOne.mockResolvedValue(applicationWithStageMock);
+      mockStagesService.findOne.mockResolvedValue(hiredStageMock);
+      mockFeedbackRepo.find.mockResolvedValue([]);
+
+      await expect(service.update(1, updateJobApplicationDtoMock))
+        .rejects
+        .toThrow(BadRequestException);
+
+      expect(mockApplicationRepo.save).not.toHaveBeenCalled();
+    });
+
+    it('debería lanzar BadRequestException si hay 2 feedbacks pero de la misma etapa', async () => {
+      const updateJobApplicationDtoMock = mock<UpdateJobApplicationDto>({
+        stageId: 3,
+      });
+
+      const applicationWithStageMock = mock<JobApplication>({
+        ...applicationMock,
+        currentStage: interviewStageMock,
+      });
+
+      const duplicateStageFeedbackMock = mock<Feedback>({
+        id: 3,
+        stage: stageMock,
+      });
+
+      mockApplicationRepo.findOne.mockResolvedValue(applicationWithStageMock);
+      mockStagesService.findOne.mockResolvedValue(hiredStageMock);
+      mockFeedbackRepo.find.mockResolvedValue([feedbackStage1Mock, duplicateStageFeedbackMock]);
+
+      await expect(service.update(1, updateJobApplicationDtoMock))
+        .rejects
+        .toThrow(BadRequestException);
+
+      expect(mockApplicationRepo.save).not.toHaveBeenCalled();
+    });
+
+    it('debería contar correctamente 3+ feedbacks de distintas etapas', async () => {
+      const updateJobApplicationDtoMock = mock<UpdateJobApplicationDto>({
+        stageId: 3,
+      });
+
+      const thirdStageFeedbackMock = mock<Feedback>({
+        id: 3,
+        stage: mock<Stage>({ id: 5, name: 'Final', isTerminal: false, isHiredStage: false }),
+      });
+
+      const applicationWithStageMock = mock<JobApplication>({
+        ...applicationMock,
+        currentStage: interviewStageMock,
+      });
+
+      const updatedApplicationMock = mock<JobApplication>({
+        ...applicationWithStageMock,
+        currentStage: hiredStageMock,
+      });
+
+      mockApplicationRepo.findOne.mockResolvedValue(applicationWithStageMock);
+      mockStagesService.findOne.mockResolvedValue(hiredStageMock);
+      mockFeedbackRepo.find.mockResolvedValue([
+        feedbackStage1Mock,
+        feedbackStage2Mock,
+        thirdStageFeedbackMock,
+      ]);
+      mockApplicationRepo.save.mockResolvedValue(updatedApplicationMock);
+
+      const result = await service.update(1, updateJobApplicationDtoMock);
+
+      expect(result.currentStage).toEqual(hiredStageMock);
     });
   });
 
