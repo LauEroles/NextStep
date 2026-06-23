@@ -12,7 +12,6 @@ describe('AuditLogsService', () => {
   let service: AuditLogsService;
   let mockAuditLogRepository: MockProxy<Repository<AuditLog>>;
 
-  // ✅ Mocks reutilizables
   const userMock = mock<User>({
     id: 1,
     firstName: 'John',
@@ -62,16 +61,11 @@ describe('AuditLogsService', () => {
     mockAuditLogRepository.save.mockReset();
   });
 
-  // ─────────────────────────────────────────
-  // SERVICE
-  // ─────────────────────────────────────────
   it('debería estar definido', () => {
     expect(service).toBeDefined();
   });
 
-  // ─────────────────────────────────────────
-  // CREATE
-  // ─────────────────────────────────────────
+
   describe('create', () => {
     it('debería crear un log correctamente con userId definido', async () => {
       const createAuditLogDtoMock: CreateAuditLogDto = {
@@ -86,7 +80,6 @@ describe('AuditLogsService', () => {
 
       const result = await service.create(createAuditLogDtoMock);
 
-      // ✅ Verificar que separa userId y lo transforma en relación { id: userId }
       expect(mockAuditLogRepository.create).toHaveBeenCalledWith({
         action: 'CREATE',
         entity: 'JobOffer',
@@ -107,7 +100,7 @@ describe('AuditLogsService', () => {
 
       const systemLogMock = mock<AuditLog>({
         id: 3,
-        user: null,
+        user: undefined,
         action: 'DELETE',
         entity: 'System',
         entityId: null,
@@ -226,9 +219,7 @@ describe('AuditLogsService', () => {
     });
   });
 
-  // ─────────────────────────────────────────
-  // FIND ALL
-  // ─────────────────────────────────────────
+
   describe('findAll', () => {
     it('debería retornar todos los logs con la relación user', async () => {
       const auditLogsMock = [auditLogMock, auditLogMock2];
@@ -236,7 +227,6 @@ describe('AuditLogsService', () => {
 
       const result = await service.findAll();
 
-      // ✅ Verificar que pide la relación 'user'
       expect(mockAuditLogRepository.find).toHaveBeenCalledWith({
         relations: ['user'],
       });
@@ -263,9 +253,7 @@ describe('AuditLogsService', () => {
     });
   });
 
-  // ─────────────────────────────────────────
-  // FIND ONE
-  // ─────────────────────────────────────────
+
   describe('findOne', () => {
     it('debería retornar un log por id', async () => {
       mockAuditLogRepository.findOneBy.mockResolvedValue(auditLogMock);
