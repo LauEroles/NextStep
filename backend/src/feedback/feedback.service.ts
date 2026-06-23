@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
@@ -8,7 +12,6 @@ import { Scorecard } from '../scorecards/entities/scorecard.entity';
 import { JobApplication } from '../job-applications/entities/job-application.entity';
 import { ClaudeService } from './claude.service';
 import { CvService } from '../cv/cv.service';
-
 
 @Injectable()
 export class FeedbackService {
@@ -21,7 +24,7 @@ export class FeedbackService {
     private readonly applicationRepository: Repository<JobApplication>,
     private readonly claudeService: ClaudeService,
     private readonly cvService: CvService,
-  ) { }
+  ) {}
 
   async create(createFeedbackDto: CreateFeedbackDto, recruiterId: number) {
     const existing = await this.feedbackRepository.findOne({
@@ -65,6 +68,14 @@ export class FeedbackService {
       },
       relations: ['application', 'stage', 'recruiter'],
       order: { stage: { sequenceOrder: 'ASC' } },
+    });
+  }
+
+  async findAllForApplicant(userId: number) {
+    return await this.feedbackRepository.find({
+      where: {
+        application: { applicant: { id: userId } },
+      },
     });
   }
 
@@ -185,4 +196,3 @@ Generá un feedback profesional, empático y constructivo en español, específi
 Hablale directamente al candidato, en tono cercano pero profesional. Máximo 200 palabras.`;
   }
 }
-  
