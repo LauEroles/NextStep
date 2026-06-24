@@ -25,7 +25,7 @@ export class FeedbackService {
     private readonly applicationRepository: Repository<JobApplication>,
     private readonly claudeService: ClaudeService,
     private readonly cvService: CvService,
-  ) {}
+  ) { }
 
   async create(createFeedbackDto: CreateFeedbackDto, recruiterId: number) {
     const existing = await this.feedbackRepository.findOne({
@@ -125,10 +125,10 @@ export class FeedbackService {
       ],
     });
 
-   const scorecards = feedback
+    const scorecards = feedback
       ? await this.scorecardRepository.find({
-          where: { feedback: { id: feedbackId } },
-        })
+        where: { feedback: { id: feedbackId } },
+      })
       : [];
 
     // 🔗 Chain of Responsibility: corre las validaciones en secuencia
@@ -147,6 +147,13 @@ export class FeedbackService {
     await this.feedbackRepository.save(feedback!);
 
     return feedback;
+  }
+
+  async findByRecruiter(recruiterId: number) {
+    return await this.feedbackRepository.find({
+      where: { recruiter: { id: recruiterId } },
+      relations: ['application', 'stage', 'recruiter'],
+    });
   }
 
   private buildSingleStagePrompt(

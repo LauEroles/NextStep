@@ -11,7 +11,7 @@ export class JobOffersService {
   constructor(
     @InjectRepository(JobOffer)
     private readonly jobOfferRepository: Repository<JobOffer>,
-  ) {}
+  ) { }
 
   async create(createJobOfferDto: CreateJobOfferDto, recruiterId: number) {
     const { seniorityId, ...offerData } = createJobOfferDto;
@@ -38,6 +38,13 @@ export class JobOffersService {
       throw new NotFoundException(`No se encontró la oferta.`);
     }
     return jobOffer;
+  }
+
+  async findByRecruiter(recruiterId: number) {
+    return await this.jobOfferRepository.find({
+      where: { recruiter: { id: recruiterId } },
+      relations: ['seniority', 'recruiter'],
+    });
   }
 
   async update(id: number, updateJobOfferDto: UpdateJobOfferDto) {
