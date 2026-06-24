@@ -71,11 +71,10 @@ entity "feedbacks" as feedbacks {
 entity "audit_logs" as audit_logs {
   * id : number <<PK>>
   --
-  user_email : number <<FK>>
+  user_id : number <<FK>>
   * action : VARCHAR(100)
-  * table_name : VARCHAR(100)
-  record_id : VARCHAR(255)
-  metadata : JSONB
+  * entity : VARCHAR(100)
+  entity_id : INT
   created_at : TIMESTAMP
 }
 

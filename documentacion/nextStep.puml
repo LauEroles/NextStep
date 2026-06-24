@@ -86,12 +86,11 @@ class CvFile {
 
 class AuditLog {
   + id : number
-  + action : string
-  + tableName : string
-  + recordId : string
-  + metadata : any
-  + createdAt : Date
   + user : User
+  + action : string
+  + entity : string
+  + entityId : number
+  + createdAt : Date
 }
 
 ' Relaciones
