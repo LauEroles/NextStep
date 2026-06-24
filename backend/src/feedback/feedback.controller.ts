@@ -9,12 +9,12 @@ import {
   UseGuards,
   Query,
 } from '@nestjs/common';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiQuery, 
-  ApiOkResponse, 
-  ApiCreatedResponse 
+import {
+  ApiTags,
+  ApiOperation,
+  ApiQuery,
+  ApiOkResponse,
+  ApiCreatedResponse,
 } from '@nestjs/swagger';
 import { FeedbackService } from './feedback.service';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
@@ -79,13 +79,28 @@ export class FeedbackController {
   }
 
   @Roles('applicant')
-  @Get('my-feedback')
+  @Get('my-feedbacks')
   @ApiOkResponse({
-    description: 'Listado de tus feedbacks personales para la postulación obtenido con éxito.',
+    description: 'Listado de tus feedbacks obtenido con éxito.',
     type: [Feedback],
   })
   @ApiOperation({
-    summary: 'Listar los feedbacks del postulante actual para una postulación específica',
+    summary: 'Listar todos los feedbacks recibidos del postulante',
+  })
+  findAllMyFeedbacks(@CurrentUser() currentUser: ActiveUser) {
+    return this.feedbackService.findAllForApplicant(currentUser.id);
+  }
+
+  @Roles('applicant')
+  @Get('my-feedback')
+  @ApiOkResponse({
+    description:
+      'Listado de tus feedbacks para la postulación obtenido con éxito.',
+    type: [Feedback],
+  })
+  @ApiOperation({
+    summary:
+      'Listar los feedbacks del postulante actual para una postulación específica',
   })
   @ApiQuery({
     name: 'applicationId',
@@ -97,7 +112,7 @@ export class FeedbackController {
     @Query('applicationId') applicationId: string,
     @CurrentUser() currentUser: ActiveUser,
   ) {
-    return this.feedbackService.findByApplicationForUser(
+    return this.feedbackService.findByApplicationForApplicant(
       +applicationId,
       currentUser.id,
     );
@@ -149,6 +164,4 @@ export class FeedbackController {
   generateFeedbackForOne(@Param('id') id: string) {
     return this.feedbackService.generateFeedbackForOne(+id);
   }
-  
-
 }
