@@ -23,8 +23,6 @@ export class FeedbackService {
     private readonly cvService: CvService,
   ) { }
 
-
-
   async create(createFeedbackDto: CreateFeedbackDto, recruiterId: number) {
     const existing = await this.feedbackRepository.findOne({
       where: {
@@ -70,7 +68,6 @@ export class FeedbackService {
     });
   }
 
-
   async findAll() {
     return await this.feedbackRepository.find({
       relations: ['application', 'stage', 'recruiter'],
@@ -99,7 +96,8 @@ export class FeedbackService {
     await this.feedbackRepository.remove(feedback);
     return { message: `Feedback #${id} eliminado correctamente` };
   }
-async generateFeedbackForOne(feedbackId: number) {
+
+  async generateFeedbackForOne(feedbackId: number) {
     const feedback = await this.feedbackRepository.findOne({
       where: { id: feedbackId },
       relations: [
