@@ -8,6 +8,7 @@ import { Scorecard } from '../scorecards/entities/scorecard.entity';
 import { JobApplication } from '../job-applications/entities/job-application.entity';
 import { ClaudeService } from './claude.service';
 import { CvService } from '../cv/cv.service';
+import { buildFeedbackGenerationChain } from './chain/feedback-generation.chain';
 
 
 @Injectable()
@@ -108,28 +109,27 @@ export class FeedbackService {
         'application.applicant',
       ],
     });
-    if (!feedback) {
-      throw new NotFoundException('No se encontró el feedback.');
-    }
-    if (!feedback.comment) {
-      throw new NotFoundException(
-        'Este feedback no tiene comentarios cargados todavía.',
-      );
-    }
 
-    const scorecards = await this.scorecardRepository.find({
-      where: { feedback: { id: feedbackId } },
-    });
+   const scorecards = feedback
+      ? await this.scorecardRepository.find({
+          where: { feedback: { id: feedbackId } },
+        })
+      : [];
 
+    // 🔗 Chain of Responsibility: corre las validaciones en secuencia
+    const chain = buildFeedbackGenerationChain();
+    chain.handle({ feedback, scorecards });
+
+    // Si llegamos acá, la cadena ya garantizó que feedback no es null
     const cv = await this.cvService.getLatestCvByUser(
-      feedback.application.applicant.id,
+      feedback!.application.applicant.id,
     );
 
-    const prompt = this.buildSingleStagePrompt(feedback, scorecards, cv);
+    const prompt = this.buildSingleStagePrompt(feedback!, scorecards, cv);
     const generatedText = await this.claudeService.generateFeedback(prompt);
 
-    feedback.publicFeedback = generatedText;
-    await this.feedbackRepository.save(feedback);
+    feedback!.publicFeedback = generatedText;
+    await this.feedbackRepository.save(feedback!);
 
     return feedback;
   }
