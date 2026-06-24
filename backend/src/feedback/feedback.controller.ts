@@ -38,7 +38,7 @@ import { Feedback } from './entities/feedback.entity';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('feedback')
 export class FeedbackController {
-  constructor(private readonly feedbackService: FeedbackService) {}
+  constructor(private readonly feedbackService: FeedbackService) { }
 
   @Roles('recruiter')
   @Post()
@@ -76,6 +76,17 @@ export class FeedbackController {
       return this.feedbackService.findByApplication(+applicationId);
     }
     return this.feedbackService.findAll();
+  }
+
+  @Roles('recruiter')
+  @Get('my-sent-feedbacks')
+  @ApiOkResponse({
+    description: 'Listado de feedbacks enviados por el recruiter actual.',
+    type: [Feedback],
+  })
+  @ApiOperation({ summary: 'Listar feedbacks enviados por el recruiter actual' })
+  findMySentFeedbacks(@CurrentUser() currentUser: ActiveUser) {
+    return this.feedbackService.findByRecruiter(currentUser.id);
   }
 
   @Roles('applicant')
