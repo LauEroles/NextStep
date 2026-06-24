@@ -4,7 +4,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Not, Repository } from 'typeorm';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { UpdateFeedbackDto } from './dto/update-feedback.dto';
 import { Feedback } from './entities/feedback.entity';
@@ -61,7 +61,7 @@ export class FeedbackService {
     });
   }
 
-  async findByApplicationForUser(applicationId: number, userId: number) {
+  async findByApplicationForApplicant(applicationId: number, userId: number) {
     return await this.feedbackRepository.find({
       where: {
         application: { id: applicationId, applicant: { id: userId } },
@@ -74,8 +74,12 @@ export class FeedbackService {
   async findAllForApplicant(userId: number) {
     return await this.feedbackRepository.find({
       where: {
-        application: { applicant: { id: userId } },
+        application: {
+          applicant: { id: userId },
+        },
+        publicFeedback: Not(IsNull()) && Not(''),
       },
+      relations: ['application', 'stage', 'recruiter'],
     });
   }
 

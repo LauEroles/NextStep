@@ -112,7 +112,7 @@ export class FeedbackController {
     @Query('applicationId') applicationId: string,
     @CurrentUser() currentUser: ActiveUser,
   ) {
-    return this.feedbackService.findByApplicationForUser(
+    return this.feedbackService.findByApplicationForApplicant(
       +applicationId,
       currentUser.id,
     );
