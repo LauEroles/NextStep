@@ -92,6 +92,7 @@
       "!**/*.decorator.ts",
       "!**/*.dto.ts",
       "!**/*.entity.ts",
+      "!**/multer.config.{js,ts}",
       "!main.ts",
       "!**/index.{js,ts}"],
     "coverageDirectory": "../coverage",
