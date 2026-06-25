@@ -1,0 +1,44 @@
+@startuml NextStep - Backend
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title NextStep — Componentes del Backend (NestJS)
+
+Container_Boundary(backend, "Backend API") {
+
+  Component(auth, "Auth Module", "JWT + bcrypt")
+  Component(guards, "JWT & Roles Guards", "passport-jwt")
+  Component(users, "Users Module", "CRUD usuarios")
+  Component(roles, "Roles Module", "admin / recruiter / applicant")
+  Component(offers, "Job Offers Module", "Vacantes")
+  Component(apps, "Job Applications", "Postulaciones + Factory")
+  Component(stages, "Stages Module", "Etapas del pipeline")
+  Component(feedback, "Feedback Module", "Feedback + Chain")
+  Component(claude, "Claude Service", "@anthropic-ai/sdk")
+  Component(scorecards, "Scorecards Module", "Evaluación por skill")
+  Component(cv, "CV Module", "Upload Multer")
+  Component(seniority, "Seniority Module", "Junior / Senior / etc.")
+  Component(audit, "Audit Logs", "Interceptor global")
+  Component(orm, "TypeORM", "Capa de datos")
+  Component(security, "Security", "helmet + ValidationPipe")
+}
+
+ContainerDb(db, "PostgreSQL")
+System_Ext(claudeAPI, "Claude API")
+System_Ext(disk, "Disco local")
+
+Rel(auth, guards, "Valida tokens")
+Rel(feedback, claude, "Genera feedback público")
+Rel(feedback, scorecards, "Usa puntajes")
+Rel(cv, disk, "Guarda archivos")
+Rel(claude, claudeAPI, "HTTPS")
+Rel(orm, db, "SQL")
+
+Rel(auth, orm, "Lee/Escribe")
+Rel(users, orm, "Lee/Escribe")
+Rel(offers, orm, "Lee/Escribe")
+Rel(apps, orm, "Lee/Escribe")
+Rel(feedback, orm, "Lee/Escribe")
+Rel(audit, orm, "Lee/Escribe")
+
+@enduml

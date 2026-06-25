@@ -1,0 +1,24 @@
+@startuml NextStep - Database
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title NextStep — Base de Datos (PostgreSQL / Supabase)
+
+Container_Boundary(db, "PostgreSQL — Supabase") {
+
+  ComponentDb(tblUsers, "users + roles", "Tablas")
+  ComponentDb(tblRecruitment, "job_offers + seniorities +\njob_applications + stages", "Tablas")
+  ComponentDb(tblFeedback, "feedbacks + scorecards", "Tablas")
+  ComponentDb(tblCv, "cv_files", "Tabla")
+  ComponentDb(tblAudit, "audit_logs", "Tabla")
+}
+
+Component(orm, "TypeORM", "NestJS Backend")
+
+Rel(orm, tblUsers, "SQL")
+Rel(orm, tblRecruitment, "SQL")
+Rel(orm, tblFeedback, "SQL")
+Rel(orm, tblCv, "SQL")
+Rel(orm, tblAudit, "SQL")
+
+@enduml

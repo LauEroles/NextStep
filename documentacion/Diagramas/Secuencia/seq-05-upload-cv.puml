@@ -1,0 +1,34 @@
+@startuml seq-05-upload-cv
+title NextStep — Subida de CV
+
+actor Postulante
+participant "CvUpload\n(Frontend)" as UI
+participant "CvController\nPOST /cv/upload" as CC
+participant "Multer\n(diskStorage)" as MUL
+participant "CvService" as CVS
+participant "Disco local\nuploads/cv/" as DISK
+database "PostgreSQL" as DB
+
+Postulante -> UI : Selecciona archivo\n(PDF/DOC/DOCX, max 5MB)
+UI -> UI : Arma FormData\n(file + userId)
+
+UI -> CC : POST /cv/upload\nmultipart + Bearer JWT
+
+CC -> MUL : FileInterceptor procesa archivo
+MUL -> MUL : Valida extensión y tamaño
+MUL -> DISK : Guarda con nombre UUID
+DISK --> MUL : storedName
+
+CC -> CVS : uploadCv(file, userId)
+CVS -> DB : INSERT cv_files\n(originalName, storedName,\nextension, directory)
+DB --> CVS : CvFile
+CVS --> CC : metadatos
+CC --> UI : { message, data }
+UI --> Postulante : Muestra confirmación
+
+note over MUL, DISK
+  El archivo físico va al disco.
+  La BD solo guarda metadatos (no el binario).
+end note
+
+@enduml
