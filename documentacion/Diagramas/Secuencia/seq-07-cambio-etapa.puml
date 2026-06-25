@@ -1,0 +1,41 @@
+@startuml seq-07-cambio-etapa
+title NextStep — Cambio de etapa del candidato
+
+actor Reclutador
+participant "StageSelector\n(Frontend)" as UI
+participant "JobApplicationsController\nPATCH /job-applications/:id" as JC
+participant "JobApplicationsService" as JAS
+participant "StagesService" as SS
+database "PostgreSQL" as DB
+
+Reclutador -> UI : Selecciona nueva etapa
+UI -> JC : PATCH /job-applications/:id\n{ stageId }\nBearer JWT
+
+JC -> JAS : update(id, { stageId })
+JAS -> DB : SELECT application + currentStage
+
+alt Etapa actual es terminal
+  JAS --> UI : 400 "Ya finalizó"
+else Etapa no terminal
+  JAS -> SS : findOne(stageId)
+  SS -> DB : SELECT stage destino
+
+  alt Destino = etapa "Contratado"
+    JAS -> DB : SELECT feedbacks de la postulación
+    JAS -> JAS : ¿Hay feedbacks de\n>= 2 etapas distintas?
+
+    alt Menos de 2 feedbacks
+      JAS --> UI : 400 "No se puede contratar\nsin 2 feedbacks"
+    else Regla cumplida
+      JAS -> DB : UPDATE current_stage
+      JAS --> UI : OK
+    end
+  else Otra etapa
+    JAS -> DB : UPDATE current_stage
+    JAS --> UI : OK
+  end
+end
+
+UI --> Reclutador : Pipeline actualizado
+
+@enduml
