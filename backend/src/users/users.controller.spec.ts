@@ -170,3 +170,6 @@ describe('UsersController', () => {
       mockUsersService.remove.mockResolvedValue({
         message: 'Usuario #1 eliminado correctamente',
       });
+  })
+  ;})
+})

@@ -608,15 +608,13 @@ describe('UsersService', () => {
     });
 
     it('debería lanzar ForbiddenException si cumple 18 mañana', () => {
-      const today = new Date();
-      const almostDate = new Date(
-        today.getFullYear() - 18,
-        today.getMonth(),
-        today.getDate() + 1,
-      ).toISOString().split('T')[0];
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2026-06-25'));
 
-      expect(() => service.validateBirthDate(almostDate))
+      expect(() => service.validateBirthDate('2008-06-26'))
         .toThrow(ForbiddenException);
-    });
+
+      jest.useRealTimers();
+    });;
   });
 });
