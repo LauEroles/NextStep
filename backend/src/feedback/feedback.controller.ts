@@ -28,6 +28,8 @@ import {
   ApiServerErrorDocs,
   ApiAuthDocs,
   ApiRolesDocs,
+  ApiValidationDocs,
+  ApiNotFoundDocs,
 } from '../common/decorators/api-docs.decorator';
 import { Feedback } from './entities/feedback.entity';
 
@@ -38,7 +40,7 @@ import { Feedback } from './entities/feedback.entity';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('feedback')
 export class FeedbackController {
-  constructor(private readonly feedbackService: FeedbackService) { }
+  constructor(private readonly feedbackService: FeedbackService) {}
 
   @Roles('recruiter')
   @Post()
@@ -46,6 +48,7 @@ export class FeedbackController {
     description: 'El feedback fue registrado correctamente en el sistema.',
     type: Feedback,
   })
+  @ApiValidationDocs()
   @ApiOperation({
     summary: 'Registrar un nuevo feedback para una etapa (Reclutadores)',
   })
@@ -84,7 +87,9 @@ export class FeedbackController {
     description: 'Listado de feedbacks enviados por el recruiter actual.',
     type: [Feedback],
   })
-  @ApiOperation({ summary: 'Listar feedbacks enviados por el recruiter actual' })
+  @ApiOperation({
+    summary: 'Listar feedbacks enviados por el recruiter actual',
+  })
   findMySentFeedbacks(@CurrentUser() currentUser: ActiveUser) {
     return this.feedbackService.findByRecruiter(currentUser.id);
   }
@@ -135,6 +140,7 @@ export class FeedbackController {
     description: 'Detalle del feedback específico obtenido correctamente.',
     type: Feedback,
   })
+  @ApiNotFoundDocs()
   @ApiOperation({
     summary: 'Obtener el detalle de un feedback específico por ID',
   })
@@ -148,6 +154,8 @@ export class FeedbackController {
     description: 'El feedback especificado se modificó correctamente.',
     type: Feedback,
   })
+  @ApiValidationDocs()
+  @ApiNotFoundDocs()
   @ApiOperation({
     summary: 'Modificar un feedback existente (Reclutadores)',
   })
@@ -163,6 +171,7 @@ export class FeedbackController {
   @ApiOkResponse({
     description: 'El feedback fue eliminado del sistema correctamente.',
   })
+  @ApiNotFoundDocs()
   @ApiOperation({
     summary: 'Eliminar un feedback del sistema (Admin/Reclutadores)',
   })
@@ -172,6 +181,15 @@ export class FeedbackController {
 
   @Roles('recruiter')
   @Post(':id/generate')
+  @ApiCreatedResponse({
+    description: 'Feedback generado con IA correctamente para la postulación.',
+    type: Feedback,
+  })
+  @ApiNotFoundDocs()
+  @ApiOperation({
+    summary:
+      'Generar un feedback con IA para una postulación específica (Reclutadores)',
+  })
   generateFeedbackForOne(@Param('id') id: string) {
     return this.feedbackService.generateFeedbackForOne(+id);
   }

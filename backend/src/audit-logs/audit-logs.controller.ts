@@ -1,9 +1,5 @@
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiOkResponse 
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiOkResponse } from '@nestjs/swagger';
 import { AuditLogsService } from './audit-logs.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -12,6 +8,7 @@ import {
   ApiServerErrorDocs,
   ApiAuthDocs,
   ApiRolesDocs,
+  ApiNotFoundDocs,
 } from '../common/decorators/api-docs.decorator';
 import { AuditLog } from './entities/audit-log.entity';
 
@@ -37,6 +34,7 @@ export class AuditLogsController {
 
   @Roles('admin')
   @Get(':id')
+  @ApiNotFoundDocs()
   @ApiOkResponse({
     description: 'Detalle del log obtenido correctamente.',
     type: AuditLog,
