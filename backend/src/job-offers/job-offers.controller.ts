@@ -8,11 +8,11 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiOkResponse, 
-  ApiCreatedResponse 
+import {
+  ApiTags,
+  ApiOperation,
+  ApiOkResponse,
+  ApiCreatedResponse,
 } from '@nestjs/swagger';
 import { JobOffersService } from './job-offers.service';
 import { CreateJobOfferDto } from './dto/create-job-offer.dto';
@@ -26,6 +26,8 @@ import {
   ApiServerErrorDocs,
   ApiAuthDocs,
   ApiRolesDocs,
+  ApiValidationDocs,
+  ApiNotFoundDocs,
 } from '../common/decorators/api-docs.decorator';
 import { JobOffer } from './entities/job-offer.entity';
 
@@ -40,10 +42,11 @@ export class JobOffersController {
 
   @Roles('recruiter')
   @Post()
-  @ApiCreatedResponse({ 
+  @ApiCreatedResponse({
     description: 'La vacante laboral fue creada correctamente.',
-    type: JobOffer 
+    type: JobOffer,
   })
+  @ApiValidationDocs()
   @ApiOperation({ summary: 'Publicar una vacante laboral (Reclutadores)' })
   create(
     @Body() createJobOfferDto: CreateJobOfferDto,
@@ -52,10 +55,24 @@ export class JobOffersController {
     return this.jobOffersService.create(createJobOfferDto, currentUser.id);
   }
 
+  @Roles('recruiter')
+  @Get('my-offers')
+  @ApiOkResponse({
+    description:
+      'Listado de ofertas del usuario actual obtenido correctamente.',
+    type: [JobOffer],
+  })
+  @ApiOperation({
+    summary: 'Listar ofertas publicadas por el usuario actual (Reclutadores)',
+  })
+  findMyOffers(@CurrentUser() currentUser: ActiveUser) {
+    return this.jobOffersService.findByRecruiter(currentUser.id);
+  }
+
   @Get()
-  @ApiOkResponse({ 
+  @ApiOkResponse({
     description: 'Listado completo de vacantes obtenido correctamente.',
-    type: [JobOffer] 
+    type: [JobOffer],
   })
   @ApiOperation({ summary: 'Obtener el listado completo de vacantes' })
   findAll() {
@@ -63,10 +80,11 @@ export class JobOffersController {
   }
 
   @Get(':id')
-  @ApiOkResponse({ 
+  @ApiOkResponse({
     description: 'Detalle de la vacante laboral obtenido con éxito.',
-    type: JobOffer 
+    type: JobOffer,
   })
+  @ApiNotFoundDocs()
   @ApiOperation({ summary: 'Obtener el detalle de una vacante por ID' })
   findOne(@Param('id') id: string) {
     return this.jobOffersService.findOne(+id);
@@ -74,10 +92,13 @@ export class JobOffersController {
 
   @Roles('recruiter', 'admin')
   @Patch(':id')
-  @ApiOkResponse({ 
-    description: 'Los datos de la vacante laboral se modificaron correctamente.',
-    type: JobOffer 
+  @ApiOkResponse({
+    description:
+      'Los datos de la vacante laboral se modificaron correctamente.',
+    type: JobOffer,
   })
+  @ApiNotFoundDocs()
+  @ApiValidationDocs()
   @ApiOperation({ summary: 'Modificar los datos de un vacante existente' })
   update(
     @Param('id') id: string,
@@ -88,9 +109,10 @@ export class JobOffersController {
 
   @Roles('admin', 'recruiter')
   @Delete(':id')
-  @ApiOkResponse({ 
-    description: 'La vacante laboral fue eliminada del sistema correctamente.' 
+  @ApiOkResponse({
+    description: 'La vacante laboral fue eliminada del sistema correctamente.',
   })
+  @ApiNotFoundDocs()
   @ApiOperation({ summary: 'Eliminar una vacante' })
   remove(@Param('id') id: string) {
     return this.jobOffersService.remove(+id);

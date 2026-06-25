@@ -1,0 +1,38 @@
+@startuml seq-02-login-google
+title NextStep — Login con Google OAuth
+
+actor Usuario
+participant "GoogleLoginButton\n(Frontend)" as UI
+participant "Google OAuth" as Google
+participant "NextAuth" as NA
+participant "AuthController\nPOST /auth/google-login" as AC
+participant "AuthService" as AS
+database "PostgreSQL" as DB
+
+Usuario -> UI : Click "Ingresar con Google"
+UI -> Google : Flujo OAuth 2.0
+Google --> NA : email verificado
+
+NA -> AC : POST /auth/google-login\n{ email }
+AC -> AS : googleSignIn(email)
+AS -> DB : findByEmail(email)
+
+alt Email no registrado
+  AS --> AC : 401 "Registrate primero"
+  AC --> NA : error
+  NA --> UI : Login fallido
+else Email existe
+  AS -> AS : Genera JWT
+  AS --> AC : { user, token }
+  AC --> NA : respuesta OK
+  NA -> NA : callback jwt:\nguarda id, role, accessToken
+  NA --> UI : Sesión creada
+  UI --> Usuario : Redirige a /{rol}/dashboard
+end
+
+note over Usuario, DB
+  Google solo autentica identidad.
+  El usuario DEBE estar previamente registrado en NextStep.
+end note
+
+@enduml

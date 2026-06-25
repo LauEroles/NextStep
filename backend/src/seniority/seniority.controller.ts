@@ -1,9 +1,9 @@
 import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiOkResponse, 
-  ApiCreatedResponse 
+import {
+  ApiTags,
+  ApiOperation,
+  ApiOkResponse,
+  ApiCreatedResponse,
 } from '@nestjs/swagger';
 import { SeniorityService } from './seniority.service';
 import { CreateSeniorityDto } from './dto/create-seniority.dto';
@@ -14,6 +14,8 @@ import {
   ApiServerErrorDocs,
   ApiAuthDocs,
   ApiRolesDocs,
+  ApiValidationDocs,
+  ApiNotFoundDocs,
 } from '../common/decorators/api-docs.decorator';
 import { Seniority } from './entities/seniority.entity';
 
@@ -28,19 +30,21 @@ export class SeniorityController {
 
   @Roles('admin', 'recruiter')
   @Post()
-  @ApiCreatedResponse({ 
+  @ApiCreatedResponse({
     description: 'El nivel de seniority fue registrado con éxito.',
-    type: Seniority 
+    type: Seniority,
   })
+  @ApiValidationDocs()
   @ApiOperation({ summary: 'Registrar un nuevo nivel de seniority' })
   create(@Body() createSeniorityDto: CreateSeniorityDto) {
     return this.seniorityService.create(createSeniorityDto);
   }
 
   @Get()
-  @ApiOkResponse({ 
-    description: 'Lista completa de niveles de seniority obtenida correctamente.',
-    type: [Seniority] 
+  @ApiOkResponse({
+    description:
+      'Lista completa de niveles de seniority obtenida correctamente.',
+    type: [Seniority],
   })
   @ApiOperation({ summary: 'Listar todos los niveles de seniority' })
   findAll() {
@@ -48,10 +52,11 @@ export class SeniorityController {
   }
 
   @Get(':id')
-  @ApiOkResponse({ 
+  @ApiOkResponse({
     description: 'Detalle del nivel de seniority obtenido con éxito.',
-    type: Seniority 
+    type: Seniority,
   })
+  @ApiNotFoundDocs()
   @ApiOperation({ summary: 'Obtener el detalle de un nivel de seniority' })
   findOne(@Param('id') id: string) {
     return this.seniorityService.findOne(+id);

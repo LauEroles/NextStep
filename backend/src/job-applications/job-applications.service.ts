@@ -23,7 +23,7 @@ export class JobApplicationsService {
     private readonly jobOffersService: JobOffersService,
     private readonly stagesService: StagesService,
     private readonly applicationFactory: ApplicationFactory,
-  ) {}
+  ) { }
 
   async create(
     createJobApplicationDto: CreateJobApplicationDto,
@@ -129,5 +129,20 @@ export class JobApplicationsService {
       relations: ['jobOffer', 'currentStage'],
       order: { createdAt: 'DESC' },
     });
+  }
+
+  async findApplicationsByStageForRecruiter(recruiterId: number) {
+    const applications = await this.applicationRepo.find({
+      where: { jobOffer: { recruiter: { id: recruiterId } } },
+      relations: ['currentStage', 'jobOffer', 'jobOffer.recruiter'],
+    });
+
+    const grouped = applications.reduce((acc, app) => {
+      const stageName = app.currentStage?.name ?? 'Sin etapa';
+      acc[stageName] = (acc[stageName] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    return Object.entries(grouped).map(([stage, count]) => ({ stage, count }));
   }
 }

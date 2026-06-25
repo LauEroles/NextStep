@@ -9,12 +9,12 @@ import {
   UseGuards,
   Query,
 } from '@nestjs/common';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiQuery, 
-  ApiOkResponse, 
-  ApiCreatedResponse 
+import {
+  ApiTags,
+  ApiOperation,
+  ApiQuery,
+  ApiOkResponse,
+  ApiCreatedResponse,
 } from '@nestjs/swagger';
 import { FeedbackService } from './feedback.service';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
@@ -28,6 +28,8 @@ import {
   ApiServerErrorDocs,
   ApiAuthDocs,
   ApiRolesDocs,
+  ApiValidationDocs,
+  ApiNotFoundDocs,
 } from '../common/decorators/api-docs.decorator';
 import { Feedback } from './entities/feedback.entity';
 
@@ -46,6 +48,7 @@ export class FeedbackController {
     description: 'El feedback fue registrado correctamente en el sistema.',
     type: Feedback,
   })
+  @ApiValidationDocs()
   @ApiOperation({
     summary: 'Registrar un nuevo feedback para una etapa (Reclutadores)',
   })
@@ -78,14 +81,42 @@ export class FeedbackController {
     return this.feedbackService.findAll();
   }
 
-  @Roles('applicant')
-  @Get('my-feedback')
+  @Roles('recruiter')
+  @Get('my-sent-feedbacks')
   @ApiOkResponse({
-    description: 'Listado de tus feedbacks personales para la postulación obtenido con éxito.',
+    description: 'Listado de feedbacks enviados por el recruiter actual.',
     type: [Feedback],
   })
   @ApiOperation({
-    summary: 'Listar los feedbacks del postulante actual para una postulación específica',
+    summary: 'Listar feedbacks enviados por el recruiter actual',
+  })
+  findMySentFeedbacks(@CurrentUser() currentUser: ActiveUser) {
+    return this.feedbackService.findByRecruiter(currentUser.id);
+  }
+
+  @Roles('applicant')
+  @Get('my-feedbacks')
+  @ApiOkResponse({
+    description: 'Listado de tus feedbacks obtenido con éxito.',
+    type: [Feedback],
+  })
+  @ApiOperation({
+    summary: 'Listar todos los feedbacks recibidos del postulante',
+  })
+  findAllMyFeedbacks(@CurrentUser() currentUser: ActiveUser) {
+    return this.feedbackService.findAllForApplicant(currentUser.id);
+  }
+
+  @Roles('applicant')
+  @Get('my-feedback')
+  @ApiOkResponse({
+    description:
+      'Listado de tus feedbacks para la postulación obtenido con éxito.',
+    type: [Feedback],
+  })
+  @ApiOperation({
+    summary:
+      'Listar los feedbacks del postulante actual para una postulación específica',
   })
   @ApiQuery({
     name: 'applicationId',
@@ -97,7 +128,7 @@ export class FeedbackController {
     @Query('applicationId') applicationId: string,
     @CurrentUser() currentUser: ActiveUser,
   ) {
-    return this.feedbackService.findByApplicationForUser(
+    return this.feedbackService.findByApplicationForApplicant(
       +applicationId,
       currentUser.id,
     );
@@ -109,6 +140,7 @@ export class FeedbackController {
     description: 'Detalle del feedback específico obtenido correctamente.',
     type: Feedback,
   })
+  @ApiNotFoundDocs()
   @ApiOperation({
     summary: 'Obtener el detalle de un feedback específico por ID',
   })
@@ -122,6 +154,8 @@ export class FeedbackController {
     description: 'El feedback especificado se modificó correctamente.',
     type: Feedback,
   })
+  @ApiValidationDocs()
+  @ApiNotFoundDocs()
   @ApiOperation({
     summary: 'Modificar un feedback existente (Reclutadores)',
   })
@@ -137,6 +171,7 @@ export class FeedbackController {
   @ApiOkResponse({
     description: 'El feedback fue eliminado del sistema correctamente.',
   })
+  @ApiNotFoundDocs()
   @ApiOperation({
     summary: 'Eliminar un feedback del sistema (Admin/Reclutadores)',
   })
@@ -146,9 +181,16 @@ export class FeedbackController {
 
   @Roles('recruiter')
   @Post(':id/generate')
+  @ApiCreatedResponse({
+    description: 'Feedback generado con IA correctamente para la postulación.',
+    type: Feedback,
+  })
+  @ApiNotFoundDocs()
+  @ApiOperation({
+    summary:
+      'Generar un feedback con IA para una postulación específica (Reclutadores)',
+  })
   generateFeedbackForOne(@Param('id') id: string) {
     return this.feedbackService.generateFeedbackForOne(+id);
   }
-  
-
 }

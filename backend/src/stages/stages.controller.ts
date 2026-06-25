@@ -8,11 +8,11 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiOkResponse, 
-  ApiCreatedResponse 
+import {
+  ApiTags,
+  ApiOperation,
+  ApiOkResponse,
+  ApiCreatedResponse,
 } from '@nestjs/swagger';
 import { StagesService } from './stages.service';
 import { CreateStageDto } from './dto/create-stage.dto';
@@ -22,8 +22,10 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import {
   ApiAuthDocs,
+  ApiNotFoundDocs,
   ApiRolesDocs,
   ApiServerErrorDocs,
+  ApiValidationDocs,
 } from '../common/decorators/api-docs.decorator';
 import { Stage } from './entities/stage.entity';
 
@@ -38,19 +40,20 @@ export class StagesController {
 
   @Roles('admin', 'recruiter')
   @Post()
-  @ApiCreatedResponse({ 
+  @ApiCreatedResponse({
     description: 'La etapa de selección fue creada con éxito.',
-    type: Stage 
+    type: Stage,
   })
+  @ApiValidationDocs()
   @ApiOperation({ summary: 'Crear una nueva etapa de selección' })
   create(@Body() createStageDto: CreateStageDto) {
     return this.stagesService.create(createStageDto);
   }
 
   @Get()
-  @ApiOkResponse({ 
+  @ApiOkResponse({
     description: 'Lista de etapas de selección obtenida correctamente.',
-    type: [Stage] 
+    type: [Stage],
   })
   @ApiOperation({ summary: 'Listar todas las etapas de selección' })
   findAll() {
@@ -58,10 +61,11 @@ export class StagesController {
   }
 
   @Get(':id')
-  @ApiOkResponse({ 
+  @ApiOkResponse({
     description: 'Detalle de la etapa de selección obtenido con éxito.',
-    type: Stage 
+    type: Stage,
   })
+  @ApiNotFoundDocs()
   @ApiOperation({ summary: 'Obtener el detalle de una etapa por ID' })
   findOne(@Param('id') id: string) {
     return this.stagesService.findOne(+id);
@@ -69,10 +73,12 @@ export class StagesController {
 
   @Roles('admin', 'recruiter')
   @Patch(':id')
-  @ApiOkResponse({ 
+  @ApiOkResponse({
     description: 'La etapa de selección fue modificada correctamente.',
-    type: Stage 
+    type: Stage,
   })
+  @ApiValidationDocs()
+  @ApiNotFoundDocs()
   @ApiOperation({ summary: 'Modificar una etapa de selección existente' })
   update(@Param('id') id: string, @Body() updateStageDto: UpdateStageDto) {
     return this.stagesService.update(+id, updateStageDto);
@@ -80,9 +86,10 @@ export class StagesController {
 
   @Roles('admin')
   @Delete(':id')
-  @ApiOkResponse({ 
-    description: 'La etapa de selección fue eliminada del sistema correctamente.' 
+  @ApiOkResponse({
+    description: 'La etapa de selección fue eliminada correctamente.',
   })
+  @ApiNotFoundDocs()
   @ApiOperation({ summary: 'Eliminar un etapa del sistema' })
   remove(@Param('id') id: string) {
     return this.stagesService.remove(+id);

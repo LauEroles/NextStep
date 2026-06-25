@@ -21,7 +21,6 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.105.0",
-    "@google/generative-ai": "^0.24.1",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.4",
     "@nestjs/core": "^11.0.1",
@@ -92,6 +91,7 @@
       "!**/*.decorator.ts",
       "!**/*.dto.ts",
       "!**/*.entity.ts",
+      "!**/multer.config.{js,ts}",
       "!main.ts",
       "!**/multer.config.{js,ts}" ,
       "!**/index.{js,ts}"],

@@ -8,11 +8,11 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiOkResponse, 
-  ApiCreatedResponse 
+import {
+  ApiTags,
+  ApiOperation,
+  ApiOkResponse,
+  ApiCreatedResponse,
 } from '@nestjs/swagger';
 import { ScorecardsService } from './scorecards.service';
 import { CreateScorecardDto } from './dto/create-scorecard.dto';
@@ -24,6 +24,8 @@ import {
   ApiServerErrorDocs,
   ApiAuthDocs,
   ApiRolesDocs,
+  ApiValidationDocs,
+  ApiNotFoundDocs,
 } from '../common/decorators/api-docs.decorator';
 import { Scorecard } from './entities/scorecard.entity';
 
@@ -38,10 +40,11 @@ export class ScorecardsController {
 
   @Roles('recruiter')
   @Post()
-  @ApiCreatedResponse({ 
+  @ApiCreatedResponse({
     description: 'La scorecard fue registrada correctamente en el sistema.',
-    type: Scorecard 
+    type: Scorecard,
   })
+  @ApiValidationDocs()
   @ApiOperation({ summary: 'Registrar una nueva scorecard (Reclutadores)' })
   create(@Body() createScorecardDto: CreateScorecardDto) {
     return this.scorecardsService.create(createScorecardDto);
@@ -49,9 +52,9 @@ export class ScorecardsController {
 
   @Roles('recruiter')
   @Get()
-  @ApiOkResponse({ 
+  @ApiOkResponse({
     description: 'Lista completa de scorecards obtenida correctamente.',
-    type: [Scorecard] 
+    type: [Scorecard],
   })
   @ApiOperation({
     summary: 'Listar todas las scorecards registradas (Reclutadores)',
@@ -62,10 +65,11 @@ export class ScorecardsController {
 
   @Roles('recruiter', 'applicant')
   @Get('feedback/:feedbackId')
-  @ApiOkResponse({ 
+  @ApiOkResponse({
     description: 'Scorecard asociada a feedback encontrada con éxito.',
-    type: Scorecard 
+    type: Scorecard,
   })
+  @ApiNotFoundDocs()
   @ApiOperation({ summary: 'Obtener la scorecard asociada a un feedback' })
   findByFeedback(@Param('feedbackId') feedbackId: string) {
     return this.scorecardsService.findByFeedback(+feedbackId);
@@ -73,10 +77,11 @@ export class ScorecardsController {
 
   @Roles('recruiter')
   @Get(':id')
-  @ApiOkResponse({ 
+  @ApiOkResponse({
     description: 'Detalle de la scorecard obtenido correctamente.',
-    type: Scorecard 
+    type: Scorecard,
   })
+  @ApiNotFoundDocs()
   @ApiOperation({ summary: 'Obtener el detalle de una scorecard por ID' })
   findOne(@Param('id') id: string) {
     return this.scorecardsService.findOne(+id);
@@ -84,10 +89,12 @@ export class ScorecardsController {
 
   @Roles('recruiter')
   @Patch(':id')
-  @ApiOkResponse({ 
+  @ApiOkResponse({
     description: 'Los puntajes de la scorecard se modificaron correctamente.',
-    type: Scorecard 
+    type: Scorecard,
   })
+  @ApiNotFoundDocs()
+  @ApiValidationDocs()
   @ApiOperation({
     summary: 'Modificar los puntajes de una scorecard (Reclutadores)',
   })
@@ -100,9 +107,10 @@ export class ScorecardsController {
 
   @Roles('recruiter', 'admin')
   @Delete(':id')
-  @ApiOkResponse({ 
-    description: 'La scorecard fue eliminada del sistema correctamente.' 
+  @ApiOkResponse({
+    description: 'La scorecard fue eliminada del sistema correctamente.',
   })
+  @ApiNotFoundDocs()
   @ApiOperation({
     summary: 'Eliminar una scorecard del sistema (Reclutadores/Admin)',
   })
