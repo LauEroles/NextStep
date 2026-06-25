@@ -9,13 +9,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { 
-  ApiBody, 
-  ApiConsumes, 
-  ApiOperation, 
-  ApiTags, 
-  ApiOkResponse, 
-  ApiCreatedResponse 
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiTags,
+  ApiOkResponse,
+  ApiCreatedResponse,
 } from '@nestjs/swagger';
 import { CvService } from './cv.service';
 import { multerConfig } from './multer.config';
@@ -26,6 +26,8 @@ import {
   ApiServerErrorDocs,
   ApiAuthDocs,
   ApiRolesDocs,
+  ApiValidationDocs,
+  ApiNotFoundDocs,
 } from '../common/decorators/api-docs.decorator';
 import { CvFile } from './entities/cv-file.entity';
 
@@ -43,8 +45,10 @@ export class CvController {
   @UseInterceptors(FileInterceptor('file', multerConfig))
   @ApiConsumes('multipart/form-data')
   @ApiCreatedResponse({
-    description: 'El archivo de currículum fue subido y almacenado correctamente.',
+    description:
+      'El archivo de currículum fue subido y almacenado correctamente.',
   })
+  @ApiValidationDocs()
   @ApiOperation({ summary: 'Subir un archivo de CV (Postulantes)' })
   @ApiBody({
     schema: {
@@ -78,10 +82,14 @@ export class CvController {
   @Roles('admin', 'recruiter', 'applicant')
   @Get('user/:userId/latest')
   @ApiOkResponse({
-    description: 'El currículum más reciente del usuario fue obtenido correctamente.',
+    description:
+      'El currículum más reciente del usuario fue obtenido correctamente.',
     type: CvFile,
   })
-  @ApiOperation({ summary: 'Obtener el último CV subido por un usuario específico' })
+  @ApiNotFoundDocs()
+  @ApiOperation({
+    summary: 'Obtener el último CV subido por un usuario específico',
+  })
   getLatest(@Param('userId') userId: number) {
     return this.cvService.getLatestCvByUser(userId);
   }
@@ -89,9 +97,11 @@ export class CvController {
   @Roles('admin', 'recruiter', 'applicant')
   @Get('user/:userId')
   @ApiOkResponse({
-    description: 'Historial completo de CVs asociados al usuario obtenido correctamente.',
+    description:
+      'Historial completo de CVs asociados al usuario obtenido correctamente.',
     type: [CvFile],
   })
+  @ApiNotFoundDocs()
   @ApiOperation({ summary: 'Obtener los CVs asociados a un usuario' })
   getByUser(@Param('userId') userId: number) {
     return this.cvService.getCvsByUser(userId);

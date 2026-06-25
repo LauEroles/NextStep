@@ -14,7 +14,7 @@ import {
   ApiOperation,
   ApiQuery,
   ApiOkResponse,
-  ApiCreatedResponse
+  ApiCreatedResponse,
 } from '@nestjs/swagger';
 import { JobApplicationsService } from './job-applications.service';
 import { CreateJobApplicationDto } from './dto/create-job-application.dto';
@@ -28,6 +28,8 @@ import {
   ApiServerErrorDocs,
   ApiAuthDocs,
   ApiRolesDocs,
+  ApiValidationDocs,
+  ApiNotFoundDocs,
 } from '../common/decorators/api-docs.decorator';
 import { JobApplication } from './entities/job-application.entity';
 
@@ -40,14 +42,15 @@ import { JobApplication } from './entities/job-application.entity';
 export class JobApplicationsController {
   constructor(
     private readonly jobApplicationsService: JobApplicationsService,
-  ) { }
+  ) {}
 
   @Roles('applicant')
   @Post()
   @ApiCreatedResponse({
     description: 'La postulación a la vacante se registró con éxito.',
-    type: JobApplication
+    type: JobApplication,
   })
+  @ApiValidationDocs()
   @ApiOperation({
     summary: 'Registrar una postulación a una vacante (Postulantes)',
   })
@@ -68,14 +71,16 @@ export class JobApplicationsController {
   })
   @ApiOperation({ summary: 'Candidatos por etapa del recruiter actual' })
   findCandidatesByStage(@CurrentUser() currentUser: ActiveUser) {
-    return this.jobApplicationsService.findApplicationsByStageForRecruiter(currentUser.id);
+    return this.jobApplicationsService.findApplicationsByStageForRecruiter(
+      currentUser.id,
+    );
   }
 
   @Roles('admin', 'recruiter')
   @Get()
   @ApiOkResponse({
     description: 'Listado global de postulaciones obtenido correctamente.',
-    type: [JobApplication]
+    type: [JobApplication],
   })
   @ApiOperation({
     summary:
@@ -98,7 +103,7 @@ export class JobApplicationsController {
   @Get('my-applications')
   @ApiOkResponse({
     description: 'Listado de tus postulaciones personales obtenido con éxito.',
-    type: [JobApplication]
+    type: [JobApplication],
   })
   @ApiOperation({ summary: 'Listar las postulaciones del postulante actual' })
   findMyApplications(@CurrentUser() currentUser: ActiveUser) {
@@ -109,8 +114,9 @@ export class JobApplicationsController {
   @Get(':id')
   @ApiOkResponse({
     description: 'Detalle completo de la postulación obtenido correctamente.',
-    type: JobApplication
+    type: JobApplication,
   })
+  @ApiNotFoundDocs()
   @ApiOperation({ summary: 'Obtener el detalle de una postulación por ID' })
   findOne(@Param('id') id: string) {
     return this.jobApplicationsService.findOne(+id, [
@@ -124,8 +130,10 @@ export class JobApplicationsController {
   @Patch(':id')
   @ApiOkResponse({
     description: 'El estado de la postulación se actualizó correctamente.',
-    type: JobApplication
+    type: JobApplication,
   })
+  @ApiNotFoundDocs()
+  @ApiValidationDocs()
   @ApiOperation({ summary: 'Actualizar el estado de una postulación' })
   update(
     @Param('id') id: string,
@@ -137,8 +145,9 @@ export class JobApplicationsController {
   @Roles('admin', 'recruiter')
   @Delete(':id')
   @ApiOkResponse({
-    description: 'La postulación fue eliminada del sistema correctamente.'
+    description: 'La postulación fue eliminada del sistema correctamente.',
   })
+  @ApiNotFoundDocs()
   @ApiOperation({ summary: 'Eliminar una postulación del sistema' })
   remove(@Param('id') id: string) {
     return this.jobApplicationsService.remove(+id);

@@ -71,10 +71,7 @@ export function ApiValidationDocs() {
           message: {
             type: 'array',
             items: { type: 'string' },
-            example: [
-              'El email debe tener formato válido',
-              'La contraseña debe tener al menos 8 caracteres',
-            ],
+            example: 'El nombre debe tener al menos 2 caracteres.',
           },
           error: { type: 'string', example: 'Bad Request' },
         },

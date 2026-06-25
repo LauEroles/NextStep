@@ -3,14 +3,17 @@ import { AuthService } from './auth.service';
 import { SignInDto } from './dto/signIn.dto';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { UsersService } from '../users/users.service';
-import { 
-  ApiBody, 
-  ApiOperation, 
+import {
+  ApiBody,
+  ApiOperation,
   ApiTags,
   ApiOkResponse,
-  ApiCreatedResponse
+  ApiCreatedResponse,
 } from '@nestjs/swagger';
-import { ApiServerErrorDocs } from '../common/decorators/api-docs.decorator';
+import {
+  ApiServerErrorDocs,
+  ApiValidationDocs,
+} from '../common/decorators/api-docs.decorator';
 import { User } from '../users/entities/user.entity';
 
 @ApiTags('Autenticación')
@@ -27,6 +30,7 @@ export class AuthController {
   @ApiOkResponse({
     description: 'Autenticación exitosa. Devuelve el token JWT.',
   })
+  @ApiValidationDocs()
   @ApiOperation({ summary: 'Iniciar sesión por email' })
   signIn(@Body() signInDto: SignInDto) {
     return this.authService.signIn(signInDto.email, signInDto.password);
@@ -35,8 +39,9 @@ export class AuthController {
   @Post('register')
   @ApiCreatedResponse({
     description: 'Usuario registrado de forma exitosa en el sistema.',
-    type: User
+    type: User,
   })
+  @ApiValidationDocs()
   @ApiOperation({ summary: 'Registrar un nuevo usuario' })
   register(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
@@ -47,6 +52,7 @@ export class AuthController {
   @ApiOkResponse({
     description: 'Autenticación exitosa. Devuelve el token JWT.',
   })
+  @ApiValidationDocs()
   @ApiOperation({ summary: 'Iniciar sesión mediante Google OAuth' })
   @ApiBody({
     schema: {

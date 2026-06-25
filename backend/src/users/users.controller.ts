@@ -8,11 +8,11 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiOkResponse,       
-  ApiCreatedResponse   
+import {
+  ApiTags,
+  ApiOperation,
+  ApiOkResponse,
+  ApiCreatedResponse,
 } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -22,12 +22,14 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import {
   ApiAuthDocs,
+  ApiNotFoundDocs,
   ApiRolesDocs,
   ApiServerErrorDocs,
+  ApiValidationDocs,
 } from '../common/decorators/api-docs.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import type { ActiveUser } from '../auth/interfaces/active-user.interface';
-import { User } from './entities/user.entity'; 
+import { User } from './entities/user.entity';
 
 @ApiTags('Usuarios')
 @ApiServerErrorDocs()
@@ -36,10 +38,11 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  @ApiCreatedResponse({ 
+  @ApiCreatedResponse({
     description: 'El usuario fue registrado con éxito en la base de datos.',
-    type: User 
+    type: User,
   })
+  @ApiValidationDocs()
   @ApiOperation({ summary: 'Crear un nuevo usuario' })
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
@@ -50,9 +53,9 @@ export class UsersController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin', 'recruiter')
   @Get()
-  @ApiOkResponse({ 
+  @ApiOkResponse({
     description: 'Lista completa de usuarios obtenida correctamente.',
-    type: [User] 
+    type: [User],
   })
   @ApiOperation({ summary: 'Listar todos los usuarios' })
   findAll() {
@@ -62,9 +65,9 @@ export class UsersController {
   @ApiAuthDocs()
   @UseGuards(JwtAuthGuard)
   @Get('my-info')
-  @ApiOkResponse({ 
+  @ApiOkResponse({
     description: 'Datos de tu perfil de usuario obtenidos con éxito.',
-    type: User 
+    type: User,
   })
   @ApiOperation({ summary: 'Obtener la información del usuario actual' })
   findMyInfo(@CurrentUser() currentUser: ActiveUser) {
@@ -76,10 +79,11 @@ export class UsersController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @Get(':id')
-  @ApiOkResponse({ 
+  @ApiOkResponse({
     description: 'Usuario encontrado e información de perfil enviada.',
-    type: User 
+    type: User,
   })
+  @ApiNotFoundDocs()
   @ApiOperation({ summary: 'Obtener un usuario por ID' })
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(+id);
@@ -88,10 +92,12 @@ export class UsersController {
   @ApiAuthDocs()
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  @ApiOkResponse({ 
+  @ApiOkResponse({
     description: 'Los datos del usuario fueron modificados correctamente.',
-    type: User 
+    type: User,
   })
+  @ApiValidationDocs()
+  @ApiNotFoundDocs()
   @ApiOperation({ summary: 'Modificar los datos de un usuario' })
   update(
     @Param('id') id: string,
@@ -106,9 +112,10 @@ export class UsersController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @Delete(':id')
-  @ApiOkResponse({ 
-    description: 'El usuario fue eliminado del sistema correctamente.' 
+  @ApiOkResponse({
+    description: 'El usuario fue eliminado del sistema correctamente.',
   })
+  @ApiNotFoundDocs()
   @ApiOperation({ summary: 'Eliminar un usuario del sistema (Admin)' })
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
