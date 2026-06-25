@@ -167,29 +167,20 @@ describe('JobOffersService', () => {
   });
 
   describe('findOne', () => {
-    it('debería retornar una oferta por id sin relaciones', async () => {
+
+    it('debería retornar una oferta por id', async () => {
       mockJobOfferRepository.findOne.mockResolvedValue(jobOfferMock);
 
       const result = await service.findOne(1);
 
       expect(mockJobOfferRepository.findOne).toHaveBeenCalledWith({
         where: { id: 1 },
-        relations: [],
-      });
-      expect(result).toEqual(jobOfferMock);
-    });
-
-    it('debería retornar una oferta por id con relaciones', async () => {
-      mockJobOfferRepository.findOne.mockResolvedValue(jobOfferMock);
-
-      const result = await service.findOne(1, ['seniority', 'recruiter']);
-
-      expect(mockJobOfferRepository.findOne).toHaveBeenCalledWith({
-        where: { id: 1 },
         relations: ['seniority', 'recruiter'],
       });
+
       expect(result).toEqual(jobOfferMock);
     });
+  
 
     it('debería lanzar NotFoundException si la oferta no existe', async () => {
       mockJobOfferRepository.findOne.mockResolvedValue(null);
