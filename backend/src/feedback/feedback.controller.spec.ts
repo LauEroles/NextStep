@@ -99,16 +99,15 @@ describe('FeedbackController', () => {
     expect(controller).toBeDefined();
   });
 
-
   describe('create', () => {
     it('debería llamar a feedbackService.create con el DTO y el id del usuario actual', async () => {
-      const createFeedbackDtoMock = mock<CreateFeedbackDto>({
+      const createFeedbackDtoMock: CreateFeedbackDto = {
         application_id: 1,
         stage_id: 1,
         technicalScore: 4,
         softSkillsScore: 3,
         comment: 'Buen candidato',
-      });
+      } as CreateFeedbackDto;
 
       mockFeedbackService.create.mockResolvedValue(feedbackMock);
 
@@ -122,10 +121,10 @@ describe('FeedbackController', () => {
     });
 
     it('debería usar el id correcto según el usuario actual', async () => {
-      const createFeedbackDtoMock = mock<CreateFeedbackDto>({
+      const createFeedbackDtoMock: CreateFeedbackDto = {
         application_id: 1,
         stage_id: 1,
-      });
+      } as CreateFeedbackDto;
 
       const otherActiveUserMock: ActiveUser = {
         id: 7,
@@ -143,7 +142,6 @@ describe('FeedbackController', () => {
       );
     });
   });
-
 
   describe('findAll', () => {
     it('debería llamar a findAll si no se envía applicationId', async () => {
@@ -185,14 +183,96 @@ describe('FeedbackController', () => {
     });
   });
 
-  describe('findMyFeedback', () => {
-    it('debería llamar a findByApplicationForUser con applicationId y el id del usuario actual', async () => {
+  describe('findMySentFeedbacks', () => {
+    it('debería llamar a findByRecruiter con el id del usuario actual', async () => {
+      const feedbacksMock = [feedbackMock, feedbackMock2];
+      mockFeedbackService.findByRecruiter.mockResolvedValue(feedbacksMock);
+
+      const result = await controller.findMySentFeedbacks(activeUserMock);
+
+      expect(mockFeedbackService.findByRecruiter).toHaveBeenCalledWith(
+        activeUserMock.id,
+      );
+      expect(result).toEqual(feedbacksMock);
+    });
+
+    it('debería usar el id correcto según el recruiter actual', async () => {
+      const otherActiveUserMock: ActiveUser = {
+        id: 12,
+        email: 'jane@example.com',
+        role: 'recruiter',
+      };
+
+      mockFeedbackService.findByRecruiter.mockResolvedValue([feedbackMock2]);
+
+      await controller.findMySentFeedbacks(otherActiveUserMock);
+
+      expect(mockFeedbackService.findByRecruiter).toHaveBeenCalledWith(12);
+    });
+
+    it('debería retornar array vacío si el recruiter no envió feedbacks', async () => {
+      mockFeedbackService.findByRecruiter.mockResolvedValue([]);
+
+      const result = await controller.findMySentFeedbacks(activeUserMock);
+
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe('findAllMyFeedbacks', () => {
+    it('debería llamar a findAllForApplicant con el id del usuario actual', async () => {
+      const applicantUserMock: ActiveUser = {
+        id: 5,
+        email: 'applicant@example.com',
+        role: 'applicant',
+      };
+
       const feedbacksMock = [feedbackMock];
-      mockFeedbackService.findByApplicationForUser.mockResolvedValue(feedbacksMock);
+      mockFeedbackService.findAllForApplicant.mockResolvedValue(feedbacksMock);
+
+      const result = await controller.findAllMyFeedbacks(applicantUserMock);
+
+      expect(mockFeedbackService.findAllForApplicant).toHaveBeenCalledWith(5);
+      expect(result).toEqual(feedbacksMock);
+    });
+
+    it('debería usar el id correcto según el applicant actual', async () => {
+      const otherApplicantMock: ActiveUser = {
+        id: 8,
+        email: 'other@example.com',
+        role: 'applicant',
+      };
+
+      mockFeedbackService.findAllForApplicant.mockResolvedValue([feedbackMock2]);
+
+      await controller.findAllMyFeedbacks(otherApplicantMock);
+
+      expect(mockFeedbackService.findAllForApplicant).toHaveBeenCalledWith(8);
+    });
+
+    it('debería retornar array vacío si el applicant no tiene feedbacks públicos', async () => {
+      const applicantUserMock: ActiveUser = {
+        id: 5,
+        email: 'applicant@example.com',
+        role: 'applicant',
+      };
+
+      mockFeedbackService.findAllForApplicant.mockResolvedValue([]);
+
+      const result = await controller.findAllMyFeedbacks(applicantUserMock);
+
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe('findMyFeedback', () => {
+    it('debería llamar a findByApplicationForApplicant con applicationId y el id del usuario actual', async () => {
+      const feedbacksMock = [feedbackMock];
+      mockFeedbackService.findByApplicationForApplicant.mockResolvedValue(feedbacksMock);
 
       const result = await controller.findMyFeedback('1', activeUserMock);
 
-      expect(mockFeedbackService.findByApplicationForUser).toHaveBeenCalledWith(
+      expect(mockFeedbackService.findByApplicationForApplicant).toHaveBeenCalledWith(
         1,
         activeUserMock.id,
       );
@@ -206,15 +286,15 @@ describe('FeedbackController', () => {
         role: 'applicant',
       };
 
-      mockFeedbackService.findByApplicationForUser.mockResolvedValue([feedbackMock2]);
+      mockFeedbackService.findByApplicationForApplicant.mockResolvedValue([feedbackMock2]);
 
       await controller.findMyFeedback('2', otherActiveUserMock);
 
-      expect(mockFeedbackService.findByApplicationForUser).toHaveBeenCalledWith(2, 9);
+      expect(mockFeedbackService.findByApplicationForApplicant).toHaveBeenCalledWith(2, 9);
     });
 
     it('debería retornar array vacío si no hay feedback para esa aplicación y usuario', async () => {
-      mockFeedbackService.findByApplicationForUser.mockResolvedValue([]);
+      mockFeedbackService.findByApplicationForApplicant.mockResolvedValue([]);
 
       const result = await controller.findMyFeedback('99', activeUserMock);
 
@@ -243,10 +323,10 @@ describe('FeedbackController', () => {
 
   describe('update', () => {
     it('debería llamar a feedbackService.update con id y DTO correctos', async () => {
-      const updateFeedbackDtoMock = mock<UpdateFeedbackDto>({
+      const updateFeedbackDtoMock: UpdateFeedbackDto = {
         technicalScore: 5,
         comment: 'Excelente candidato',
-      });
+      } as UpdateFeedbackDto;
 
       const updatedFeedbackMock = mock<Feedback>({
         ...feedbackMock,

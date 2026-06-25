@@ -2,11 +2,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { mock, MockProxy } from 'jest-mock-extended';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
+import { User } from './entities/user.entity';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { ActiveUser } from '../auth/interfaces/active-user.interface';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { CreateUserDto, UserRoleName } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
 
 describe('UsersController', () => {
   let controller: UsersController;
@@ -19,6 +20,12 @@ describe('UsersController', () => {
     email: 'john@example.com',
     isActive: true,
   });
+
+  const activeUserMock: ActiveUser = {
+    id: 1,
+    email: 'john@example.com',
+    role: 'applicant',
+  };
 
   beforeAll(async () => {
     mockUsersService = mock<UsersService>();
@@ -49,14 +56,15 @@ describe('UsersController', () => {
     expect(controller).toBeDefined();
   });
 
+
   describe('create', () => {
     it('debería llamar a usersService.create con el DTO correcto', async () => {
-      const createUserDtoMock = mock<CreateUserDto>({
+      const createUserDtoMock: CreateUserDto = {
         firstName: 'John',
         lastName: 'Doe',
         email: 'john@example.com',
         password: 'Secret123!',
-      });
+      } as CreateUserDto;
 
       mockUsersService.create.mockResolvedValue(userMock as any);
 
@@ -66,7 +74,6 @@ describe('UsersController', () => {
       expect(result).toEqual(userMock);
     });
   });
-
 
   describe('findAll', () => {
     it('debería llamar a usersService.findAll', async () => {
@@ -80,42 +87,86 @@ describe('UsersController', () => {
   });
 
 
+  describe('findMyInfo', () => {
+    it('debería llamar a usersService.findOne con el id del usuario actual', async () => {
+      mockUsersService.findOne.mockResolvedValue(userMock);
+
+      const result = await controller.findMyInfo(activeUserMock);
+
+      expect(mockUsersService.findOne).toHaveBeenCalledWith(activeUserMock.id);
+      expect(result).toEqual(userMock);
+    });
+
+    it('debería usar el id correcto según el usuario actual', async () => {
+      const otherActiveUserMock: ActiveUser = {
+        id: 7,
+        email: 'jane@example.com',
+        role: 'recruiter',
+      };
+
+      mockUsersService.findOne.mockResolvedValue(userMock);
+
+      await controller.findMyInfo(otherActiveUserMock);
+
+      expect(mockUsersService.findOne).toHaveBeenCalledWith(7);
+    });
+  });
+
+
   describe('findOne', () => {
     it('debería llamar a usersService.findOne con el id correcto', async () => {
       mockUsersService.findOne.mockResolvedValue(userMock);
 
       const result = await controller.findOne('1');
 
-    
       expect(mockUsersService.findOne).toHaveBeenCalledWith(1);
       expect(result).toEqual(userMock);
     });
   });
 
-
   describe('update', () => {
-    it('debería llamar a usersService.update con id y DTO correctos', async () => {
-      const updateUserDtoMock = mock<UpdateUserDto>({
+    it('debería llamar a usersService.update con id, DTO y usuario actual correctos', async () => {
+      const updateUserDtoMock: UpdateUserDto = {
         firstName: 'Johnny',
-      });
+      } as UpdateUserDto;
 
       mockUsersService.update.mockResolvedValue(userMock);
 
-      const result = await controller.update('1', updateUserDtoMock);
+      const result = await controller.update('1', updateUserDtoMock, activeUserMock);
 
-      expect(mockUsersService.update).toHaveBeenCalledWith(1, updateUserDtoMock);
+      expect(mockUsersService.update).toHaveBeenCalledWith(
+        1,
+        updateUserDtoMock,
+        activeUserMock,
+      );
       expect(result).toEqual(userMock);
+    });
+
+    it('debería pasar el usuario actual correcto según quién hace la petición', async () => {
+      const updateUserDtoMock: UpdateUserDto = {
+        firstName: 'Jane',
+      } as UpdateUserDto;
+
+      const otherActiveUserMock: ActiveUser = {
+        id: 9,
+        email: 'admin@example.com',
+        role: 'admin',
+      };
+
+      mockUsersService.update.mockResolvedValue(userMock);
+
+      await controller.update('2', updateUserDtoMock, otherActiveUserMock);
+
+      expect(mockUsersService.update).toHaveBeenCalledWith(
+        2,
+        updateUserDtoMock,
+        otherActiveUserMock,
+      );
     });
   });
 
   describe('remove', () => {
     it('debería llamar a usersService.remove con el id correcto', async () => {
-      mockUsersService.remove.mockResolvedValue({ message: 'Usuario #1 eliminado correctamente' });
-
-      const result = await controller.remove('1');
-
-      expect(mockUsersService.remove).toHaveBeenCalledWith(1);
-      expect(result).toEqual({ message: 'Usuario #1 eliminado correctamente' });
-    });
-  });
-});
+      mockUsersService.remove.mockResolvedValue({
+        message: 'Usuario #1 eliminado correctamente',
+      });

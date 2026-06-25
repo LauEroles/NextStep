@@ -172,15 +172,13 @@ describe('FeedbackService', () => {
     mockCvService.getLatestCvByUser.mockReset();
   });
 
-
   it('debería estar definido', () => {
     expect(service).toBeDefined();
   });
 
-
   describe('create', () => {
     it('debería crear un feedback correctamente si no existe uno previo', async () => {
-      const createFeedbackDtoMock = mock<CreateFeedbackDto>({
+      const createFeedbackDtoMock: CreateFeedbackDto = {
         application_id: 1,
         stage_id: 1,
         technicalScore: 4,
@@ -188,7 +186,7 @@ describe('FeedbackService', () => {
         comment: 'Buen candidato',
         internalNotes: 'Notas internas',
         publicFeedback: '',
-      });
+      } as CreateFeedbackDto;
 
       mockFeedbackRepository.findOne.mockResolvedValue(null);
       mockFeedbackRepository.create.mockReturnValue(feedbackMock);
@@ -217,10 +215,10 @@ describe('FeedbackService', () => {
     });
 
     it('debería lanzar BadRequestException si ya existe un feedback para esa etapa y aplicación', async () => {
-      const createFeedbackDtoMock = mock<CreateFeedbackDto>({
+      const createFeedbackDtoMock: CreateFeedbackDto = {
         application_id: 1,
         stage_id: 1,
-      });
+      } as CreateFeedbackDto;
 
       mockFeedbackRepository.findOne.mockResolvedValue(feedbackMock);
 
@@ -237,10 +235,10 @@ describe('FeedbackService', () => {
     });
 
     it('debería verificar correctamente con distintos application_id y stage_id', async () => {
-      const createFeedbackDtoMock = mock<CreateFeedbackDto>({
+      const createFeedbackDtoMock: CreateFeedbackDto = {
         application_id: 3,
         stage_id: 2,
-      });
+      } as CreateFeedbackDto;
 
       mockFeedbackRepository.findOne.mockResolvedValue(null);
       mockFeedbackRepository.create.mockReturnValue(feedbackMock);
@@ -257,10 +255,10 @@ describe('FeedbackService', () => {
     });
 
     it('debería asignar el recruiterId correctamente', async () => {
-      const createFeedbackDtoMock = mock<CreateFeedbackDto>({
+      const createFeedbackDtoMock: CreateFeedbackDto = {
         application_id: 1,
         stage_id: 1,
-      });
+      } as CreateFeedbackDto;
 
       mockFeedbackRepository.findOne.mockResolvedValue(null);
       mockFeedbackRepository.create.mockReturnValue(feedbackMock);
@@ -273,7 +271,6 @@ describe('FeedbackService', () => {
       );
     });
   });
-
 
   describe('findByApplication', () => {
     it('debería retornar feedbacks por applicationId con relaciones y orden', async () => {
@@ -299,13 +296,12 @@ describe('FeedbackService', () => {
     });
   });
 
-
-  describe('findByApplicationForUser', () => {
+  describe('findByApplicationForApplicant', () => {
     it('debería retornar feedbacks filtrando por applicationId y userId', async () => {
       const feedbacksMock = [feedbackMock];
       mockFeedbackRepository.find.mockResolvedValue(feedbacksMock);
 
-      const result = await service.findByApplicationForUser(1, 1);
+      const result = await service.findByApplicationForApplicant(1, 1);
 
       expect(mockFeedbackRepository.find).toHaveBeenCalledWith({
         where: {
@@ -320,7 +316,7 @@ describe('FeedbackService', () => {
     it('debería retornar array vacío si el usuario no tiene feedbacks en esa aplicación', async () => {
       mockFeedbackRepository.find.mockResolvedValue([]);
 
-      const result = await service.findByApplicationForUser(1, 99);
+      const result = await service.findByApplicationForApplicant(1, 99);
 
       expect(result).toEqual([]);
     });
@@ -328,13 +324,63 @@ describe('FeedbackService', () => {
     it('debería usar el applicationId y userId correctos en el filtro', async () => {
       mockFeedbackRepository.find.mockResolvedValue([feedbackMock2]);
 
-      await service.findByApplicationForUser(5, 10);
+      await service.findByApplicationForApplicant(5, 10);
 
       expect(mockFeedbackRepository.find).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { application: { id: 5, applicant: { id: 10 } } },
         }),
       );
+    });
+  });
+
+  describe('findAllForApplicant', () => {
+    it('debería retornar feedbacks públicos del applicant con sus relaciones', async () => {
+      const feedbacksMock = [feedbackMock2];
+      mockFeedbackRepository.find.mockResolvedValue(feedbacksMock);
+
+      const result = await service.findAllForApplicant(1);
+
+      expect(mockFeedbackRepository.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            application: { applicant: { id: 1 } },
+          }),
+          relations: ['application', 'stage', 'recruiter'],
+        }),
+      );
+      expect(result).toEqual(feedbacksMock);
+    });
+
+    it('debería retornar array vacío si el applicant no tiene feedbacks públicos', async () => {
+      mockFeedbackRepository.find.mockResolvedValue([]);
+
+      const result = await service.findAllForApplicant(99);
+
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe('findByRecruiter', () => {
+    it('debería retornar feedbacks creados por el recruiter con sus relaciones', async () => {
+      const feedbacksMock = [feedbackMock, feedbackMock2];
+      mockFeedbackRepository.find.mockResolvedValue(feedbacksMock);
+
+      const result = await service.findByRecruiter(2);
+
+      expect(mockFeedbackRepository.find).toHaveBeenCalledWith({
+        where: { recruiter: { id: 2 } },
+        relations: ['application', 'stage', 'recruiter'],
+      });
+      expect(result).toEqual(feedbacksMock);
+    });
+
+    it('debería retornar array vacío si el recruiter no tiene feedbacks creados', async () => {
+      mockFeedbackRepository.find.mockResolvedValue([]);
+
+      const result = await service.findByRecruiter(99);
+
+      expect(result).toEqual([]);
     });
   });
 
@@ -359,7 +405,6 @@ describe('FeedbackService', () => {
       expect(result).toEqual([]);
     });
   });
-
 
   describe('findOne', () => {
     it('debería retornar un feedback por id con sus relaciones', async () => {
@@ -387,13 +432,12 @@ describe('FeedbackService', () => {
     });
   });
 
-
   describe('update', () => {
     it('debería actualizar un feedback correctamente', async () => {
-      const updateFeedbackDtoMock = mock<UpdateFeedbackDto>({
+      const updateFeedbackDtoMock: UpdateFeedbackDto = {
         technicalScore: 5,
         comment: 'Excelente candidato',
-      });
+      } as UpdateFeedbackDto;
 
       const updatedFeedbackMock = mock<Feedback>({
         ...feedbackMock,
@@ -462,7 +506,7 @@ describe('FeedbackService', () => {
         publicFeedback: generatedTextMock,
       } as Feedback);
 
-      const result = await service.generateFeedbackForOne(1);
+      const result = (await service.generateFeedbackForOne(1)) as Feedback;
 
       expect(mockFeedbackRepository.findOne).toHaveBeenCalledWith({
         where: { id: 1 },
@@ -504,6 +548,7 @@ describe('FeedbackService', () => {
       });
 
       mockFeedbackRepository.findOne.mockResolvedValue(feedbackWithoutCommentMock);
+      mockScorecardRepository.find.mockResolvedValue([scorecardMock]);
 
       await expect(service.generateFeedbackForOne(1))
         .rejects
@@ -516,7 +561,7 @@ describe('FeedbackService', () => {
       expect(mockClaudeService.generateFeedback).not.toHaveBeenCalled();
     });
 
-    it('debería generar feedback aunque no haya scorecards', async () => {
+    it('debería lanzar BadRequestException si no hay scorecards cargados', async () => {
       const feedbackWithRelationsMock = mock<Feedback>({
         ...feedbackMock,
         application: applicationMock,
@@ -525,16 +570,17 @@ describe('FeedbackService', () => {
 
       mockFeedbackRepository.findOne.mockResolvedValue(feedbackWithRelationsMock);
       mockScorecardRepository.find.mockResolvedValue([]);
-      mockCvService.getLatestCvByUser.mockResolvedValue(cvFileMock);
-      mockClaudeService.generateFeedback.mockResolvedValue('Feedback sin scorecards');
-      mockFeedbackRepository.save.mockResolvedValue(feedbackWithRelationsMock);
 
-      const result = await service.generateFeedbackForOne(1);
+      await expect(service.generateFeedbackForOne(1))
+        .rejects
+        .toThrow(BadRequestException);
 
-      expect(mockClaudeService.generateFeedback).toHaveBeenCalledWith(
-        expect.stringContaining('No se registraron scorecards para esta etapa.'),
-      );
-      expect(result).toBeDefined();
+      await expect(service.generateFeedbackForOne(1))
+        .rejects
+        .toThrow('No se puede generar el feedback público sin al menos un scorecard cargado.');
+
+      expect(mockClaudeService.generateFeedback).not.toHaveBeenCalled();
+      expect(mockFeedbackRepository.save).not.toHaveBeenCalled();
     });
 
     it('debería generar feedback aunque el candidato no tenga CV', async () => {
@@ -550,7 +596,7 @@ describe('FeedbackService', () => {
       mockClaudeService.generateFeedback.mockResolvedValue('Feedback sin CV');
       mockFeedbackRepository.save.mockResolvedValue(feedbackWithRelationsMock);
 
-      const result = await service.generateFeedbackForOne(1);
+      const result = (await service.generateFeedbackForOne(1)) as Feedback;
 
       expect(mockClaudeService.generateFeedback).toHaveBeenCalledWith(
         expect.stringContaining('El candidato no adjuntó CV.'),
@@ -587,7 +633,7 @@ describe('FeedbackService', () => {
       const feedbackWithRelationsMock = mock<Feedback>({
         ...feedbackMock,
         application: applicationMock,
-        stage: stageMock, // ✅ "Entrevista técnica", no es etapa de rechazo
+        stage: stageMock,
       });
 
       mockFeedbackRepository.findOne.mockResolvedValue(feedbackWithRelationsMock);
@@ -621,7 +667,7 @@ describe('FeedbackService', () => {
       });
 
       mockFeedbackRepository.findOne.mockResolvedValue(feedbackWithoutSeniorityMock);
-      mockScorecardRepository.find.mockResolvedValue([]);
+      mockScorecardRepository.find.mockResolvedValue([scorecardMock]);
       mockCvService.getLatestCvByUser.mockResolvedValue(null);
       mockClaudeService.generateFeedback.mockResolvedValue('Feedback sin seniority');
       mockFeedbackRepository.save.mockResolvedValue(feedbackWithoutSeniorityMock);
