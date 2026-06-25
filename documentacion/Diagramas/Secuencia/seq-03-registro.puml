@@ -1,0 +1,37 @@
+@startuml seq-03-registro
+title NextStep — Registro de usuario
+
+actor Usuario
+participant "RegisterForm\n(Frontend)" as UI
+participant "auth.service.ts" as SVC
+participant "AuthController\nPOST /auth/register" as AC
+participant "UsersService" as US
+participant "RolesService" as RS
+database "PostgreSQL" as DB
+participant "AuditLogsInterceptor" as AUDIT
+
+Usuario -> UI : Completa formulario\n(nombre, email, password, rol)
+UI -> UI : Valida edad (isAdult)
+UI -> SVC : registerWithEmail(payload)
+SVC -> AC : POST /auth/register
+AC -> US : create(dto)
+
+US -> DB : ¿Email ya existe?
+alt Email duplicado
+  US --> SVC : 409 Conflict
+  SVC --> UI : Error
+else Email disponible
+  US -> RS : findByName(roleName)
+  RS -> DB : SELECT role
+  US -> US : bcrypt.hash(password, 10)
+  US -> DB : INSERT user
+  DB --> US : usuario creado
+  US --> AC : user (sin password)
+  AC --> AUDIT : respuesta POST
+  AUDIT -> DB : INSERT audit_log (CREATE, User)
+  AC --> SVC : 201 Created
+  SVC --> UI : OK
+  UI --> Usuario : Redirige a /login
+end
+
+@enduml

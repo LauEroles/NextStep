@@ -8,6 +8,12 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiOkResponse,
+  ApiCreatedResponse,
+} from '@nestjs/swagger';
 import { JobOffersService } from './job-offers.service';
 import { CreateJobOfferDto } from './dto/create-job-offer.dto';
 import { UpdateJobOfferDto } from './dto/update-job-offer.dto';
@@ -16,7 +22,19 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import type { ActiveUser } from '../auth/interfaces/active-user.interface';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import {
+  ApiServerErrorDocs,
+  ApiAuthDocs,
+  ApiRolesDocs,
+  ApiValidationDocs,
+  ApiNotFoundDocs,
+} from '../common/decorators/api-docs.decorator';
+import { JobOffer } from './entities/job-offer.entity';
 
+@ApiTags('Vacantes Laborales')
+@ApiServerErrorDocs()
+@ApiAuthDocs()
+@ApiRolesDocs()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('job-offers')
 export class JobOffersController {
@@ -24,6 +42,12 @@ export class JobOffersController {
 
   @Roles('recruiter')
   @Post()
+  @ApiCreatedResponse({
+    description: 'La vacante laboral fue creada correctamente.',
+    type: JobOffer,
+  })
+  @ApiValidationDocs()
+  @ApiOperation({ summary: 'Publicar una vacante laboral (Reclutadores)' })
   create(
     @Body() createJobOfferDto: CreateJobOfferDto,
     @CurrentUser() currentUser: ActiveUser,
@@ -31,18 +55,51 @@ export class JobOffersController {
     return this.jobOffersService.create(createJobOfferDto, currentUser.id);
   }
 
+  @Roles('recruiter')
+  @Get('my-offers')
+  @ApiOkResponse({
+    description:
+      'Listado de ofertas del usuario actual obtenido correctamente.',
+    type: [JobOffer],
+  })
+  @ApiOperation({
+    summary: 'Listar ofertas publicadas por el usuario actual (Reclutadores)',
+  })
+  findMyOffers(@CurrentUser() currentUser: ActiveUser) {
+    return this.jobOffersService.findByRecruiter(currentUser.id);
+  }
+
   @Get()
+  @ApiOkResponse({
+    description: 'Listado completo de vacantes obtenido correctamente.',
+    type: [JobOffer],
+  })
+  @ApiOperation({ summary: 'Obtener el listado completo de vacantes' })
   findAll() {
     return this.jobOffersService.findAll();
   }
 
   @Get(':id')
+  @ApiOkResponse({
+    description: 'Detalle de la vacante laboral obtenido con éxito.',
+    type: JobOffer,
+  })
+  @ApiNotFoundDocs()
+  @ApiOperation({ summary: 'Obtener el detalle de una vacante por ID' })
   findOne(@Param('id') id: string) {
     return this.jobOffersService.findOne(+id);
   }
 
   @Roles('recruiter', 'admin')
   @Patch(':id')
+  @ApiOkResponse({
+    description:
+      'Los datos de la vacante laboral se modificaron correctamente.',
+    type: JobOffer,
+  })
+  @ApiNotFoundDocs()
+  @ApiValidationDocs()
+  @ApiOperation({ summary: 'Modificar los datos de un vacante existente' })
   update(
     @Param('id') id: string,
     @Body() updateJobOfferDto: UpdateJobOfferDto,
@@ -52,6 +109,11 @@ export class JobOffersController {
 
   @Roles('admin', 'recruiter')
   @Delete(':id')
+  @ApiOkResponse({
+    description: 'La vacante laboral fue eliminada del sistema correctamente.',
+  })
+  @ApiNotFoundDocs()
+  @ApiOperation({ summary: 'Eliminar una vacante' })
   remove(@Param('id') id: string) {
     return this.jobOffersService.remove(+id);
   }

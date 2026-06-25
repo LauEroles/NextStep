@@ -1,0 +1,32 @@
+@startuml NextStep - Frontend
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title NextStep — Componentes del Frontend (NextStep_TP)
+
+Container_Boundary(frontend, "Frontend App") {
+
+  Component(pages, "Pages & Layouts", "App Router", "Rutas por rol")
+  Component(ui, "UI Components", "React", "Formularios, modales, gráficos")
+  Component(actions, "Server Actions", "Next.js", "Lógica servidor → backend")
+  Component(services, "API Services", "fetch", "lib/services/*.ts")
+  Component(auth, "NextAuth", "next-auth v5", "Sesión + JWT del backend")
+  Component(proxy, "Auth Proxy", "proxy.ts", "Protección de rutas por rol")
+}
+
+System_Ext(backend, "Backend NestJS")
+System_Ext(google, "Google OAuth")
+System_Ext(recharts, "Recharts")
+System_Ext(tanstack, "TanStack Table")
+
+Rel(pages, ui, "Renderiza")
+Rel(pages, actions, "Invoca")
+Rel(pages, proxy, "Protegido por")
+Rel(actions, services, "Usa")
+Rel(services, backend, "HTTP + Bearer")
+Rel(auth, google, "OAuth")
+Rel(auth, backend, "Login / register")
+Rel(ui, recharts, "Gráficos")
+Rel(ui, tanstack, "Tablas")
+
+@enduml

@@ -6,12 +6,8 @@ import { AuditLog } from './entities/audit-log.entity';
 import { AuditLogsInterceptor } from './audit-logs.interceptor';
 import { JwtModule } from '@nestjs/jwt';
 
-
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([AuditLog]),
-    JwtModule,
-  ],
+  imports: [TypeOrmModule.forFeature([AuditLog]), JwtModule],
   controllers: [AuditLogsController],
   providers: [AuditLogsService, AuditLogsInterceptor],
   exports: [AuditLogsService, AuditLogsInterceptor],

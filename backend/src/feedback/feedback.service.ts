@@ -1,6 +1,10 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Not, Repository } from 'typeorm';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { UpdateFeedbackDto } from './dto/update-feedback.dto';
 import { Feedback } from './entities/feedback.entity';
@@ -8,7 +12,7 @@ import { Scorecard } from '../scorecards/entities/scorecard.entity';
 import { JobApplication } from '../job-applications/entities/job-application.entity';
 import { ClaudeService } from './claude.service';
 import { CvService } from '../cv/cv.service';
-
+import { buildFeedbackGenerationChain } from './chain/feedback-generation.chain';
 
 @Injectable()
 export class FeedbackService {
@@ -22,8 +26,6 @@ export class FeedbackService {
     private readonly claudeService: ClaudeService,
     private readonly cvService: CvService,
   ) { }
-
-
 
   async create(createFeedbackDto: CreateFeedbackDto, recruiterId: number) {
     const existing = await this.feedbackRepository.findOne({
@@ -60,7 +62,7 @@ export class FeedbackService {
     });
   }
 
-  async findByApplicationForUser(applicationId: number, userId: number) {
+  async findByApplicationForApplicant(applicationId: number, userId: number) {
     return await this.feedbackRepository.find({
       where: {
         application: { id: applicationId, applicant: { id: userId } },
@@ -70,6 +72,17 @@ export class FeedbackService {
     });
   }
 
+  async findAllForApplicant(userId: number) {
+    return await this.feedbackRepository.find({
+      where: {
+        application: {
+          applicant: { id: userId },
+        },
+        publicFeedback: Not(IsNull()) && Not(''),
+      },
+      relations: ['application', 'stage', 'recruiter'],
+    });
+  }
 
   async findAll() {
     return await this.feedbackRepository.find({
@@ -99,7 +112,8 @@ export class FeedbackService {
     await this.feedbackRepository.remove(feedback);
     return { message: `Feedback #${id} eliminado correctamente` };
   }
-async generateFeedbackForOne(feedbackId: number) {
+
+  async generateFeedbackForOne(feedbackId: number) {
     const feedback = await this.feedbackRepository.findOne({
       where: { id: feedbackId },
       relations: [
@@ -110,30 +124,36 @@ async generateFeedbackForOne(feedbackId: number) {
         'application.applicant',
       ],
     });
-    if (!feedback) {
-      throw new NotFoundException('No se encontró el feedback.');
-    }
-    if (!feedback.comment) {
-      throw new NotFoundException(
-        'Este feedback no tiene comentarios cargados todavía.',
-      );
-    }
 
-    const scorecards = await this.scorecardRepository.find({
-      where: { feedback: { id: feedbackId } },
-    });
+    const scorecards = feedback
+      ? await this.scorecardRepository.find({
+        where: { feedback: { id: feedbackId } },
+      })
+      : [];
 
+    // 🔗 Chain of Responsibility: corre las validaciones en secuencia
+    const chain = buildFeedbackGenerationChain();
+    chain.handle({ feedback, scorecards });
+
+    // Si llegamos acá, la cadena ya garantizó que feedback no es null
     const cv = await this.cvService.getLatestCvByUser(
-      feedback.application.applicant.id,
+      feedback!.application.applicant.id,
     );
 
-    const prompt = this.buildSingleStagePrompt(feedback, scorecards, cv);
+    const prompt = this.buildSingleStagePrompt(feedback!, scorecards, cv);
     const generatedText = await this.claudeService.generateFeedback(prompt);
 
-    feedback.publicFeedback = generatedText;
-    await this.feedbackRepository.save(feedback);
+    feedback!.publicFeedback = generatedText;
+    await this.feedbackRepository.save(feedback!);
 
     return feedback;
+  }
+
+  async findByRecruiter(recruiterId: number) {
+    return await this.feedbackRepository.find({
+      where: { recruiter: { id: recruiterId } },
+      relations: ['application', 'stage', 'recruiter'],
+    });
   }
 
   private buildSingleStagePrompt(
@@ -187,4 +207,3 @@ Generá un feedback profesional, empático y constructivo en español, específi
 Hablale directamente al candidato, en tono cercano pero profesional. Máximo 200 palabras.`;
   }
 }
-  

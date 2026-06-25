@@ -44,15 +44,15 @@ import { JwtModule } from '@nestjs/jwt';
     AuditLogsModule,
     ScorecardsModule,
     CvModule,
-    JwtModule
+    JwtModule,
   ],
   controllers: [AppController],
-  providers: [AppService,
+  providers: [
+    AppService,
     {
       provide: APP_INTERCEPTOR,
       useClass: AuditLogsInterceptor,
     },
-
   ],
 })
-export class AppModule { }
+export class AppModule {}

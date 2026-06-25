@@ -1,0 +1,53 @@
+@startuml seq-04-postulacion
+title NextStep — Postulación a una vacante
+
+actor Postulante
+participant "JobCard\n(Frontend)" as UI
+participant "JobApplicationsController\nPOST /job-applications" as JC
+participant "JwtAuthGuard +\nRolesGuard" as GUARD
+participant "JobApplicationsService" as JAS
+participant "JobOffersService" as JOS
+participant "StagesService" as SS
+participant "ApplicationFactory" as FACT
+database "PostgreSQL" as DB
+participant "AuditLogsInterceptor" as AUDIT
+
+Postulante -> UI : Click "Postularme"
+UI -> JC : POST /job-applications\n{ jobOfferId }\nAuthorization: Bearer JWT
+
+JC -> GUARD : Valida token + rol applicant
+GUARD --> JC : OK
+
+JC -> JAS : create(dto, applicantId)
+
+JAS -> JOS : findOne(jobOfferId)
+JOS -> DB : SELECT job_offer
+
+alt Oferta inactiva o no existe
+  JAS --> UI : 400 / 404
+else Oferta activa
+  JAS -> DB : ¿Ya postuló antes?
+
+  alt Ya postulado
+    JAS --> UI : 400 "Ya te has postulado"
+  else Primera postulación
+    JAS -> SS : findInitialStage()
+  SS -> DB : SELECT stage inicial
+    JAS -> SS : findAll()
+    JAS -> FACT : create(jobOfferId, applicantId,\ninitialStage, allStages)
+
+    FACT -> DB : INSERT job_application
+    loop Por cada etapa no terminal
+      FACT -> DB : INSERT feedback vacío\n(por etapa)
+    end
+    FACT --> JAS : application
+
+    JAS --> JC : 201 Created
+    JC --> AUDIT : respuesta
+    AUDIT -> DB : INSERT audit_log (CREATE)
+    JC --> UI : OK
+    UI --> Postulante : "Postulación exitosa"
+  end
+end
+
+@enduml

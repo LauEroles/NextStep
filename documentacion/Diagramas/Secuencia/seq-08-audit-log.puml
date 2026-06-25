@@ -1,0 +1,32 @@
+@startuml seq-08-audit-log
+title NextStep — Registro automático de auditoría
+
+actor Usuario
+participant "Cualquier Controller\n(POST/PATCH/DELETE)" as CTRL
+participant "AuditLogsInterceptor\n(global)" as INT
+participant "Servicio de negocio" as SVC
+database "PostgreSQL" as DB
+participant "AuditLogsService" as AUD
+
+Usuario -> CTRL : Request autenticado\n(excepto /auth/login)
+
+CTRL -> SVC : Ejecuta operación
+SVC -> DB : INSERT / UPDATE / DELETE
+DB --> SVC : respuesta con id
+SVC --> CTRL : responseBody
+
+CTRL --> INT : respuesta exitosa (tap)
+
+INT -> INT : Decodifica JWT → userId
+INT -> INT : Mapea método HTTP → acción\nPOST=CREATE, PATCH=UPDATE, DELETE=DELETE
+INT -> INT : Infiere entidad desde URL\n(ej: job-offers → JobOffer)
+
+INT -> AUD : create({ userId, action, entity, entityId })
+AUD -> DB : INSERT audit_logs
+
+note over INT, DB
+  El interceptor es global (APP_INTERCEPTOR).
+  /auth/login queda excluido explícitamente.
+end note
+
+@enduml
