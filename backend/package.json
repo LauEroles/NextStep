@@ -93,6 +93,7 @@
       "!**/*.entity.ts",
       "!**/multer.config.{js,ts}",
       "!main.ts",
+      "!**/multer.config.{js,ts}" ,
       "!**/index.{js,ts}"],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"

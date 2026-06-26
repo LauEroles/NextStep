@@ -14,7 +14,7 @@ describe('JobOffersService', () => {
   let service: JobOffersService;
   let mockJobOfferRepository: MockProxy<Repository<JobOffer>>;
 
-  // ✅ Mocks reutilizables
+
   const seniorityMock = mock<Seniority>({
     id: 1,
     name: 'junior',
@@ -82,65 +82,65 @@ describe('JobOffersService', () => {
   });
 
   describe('create', () => {
-    it('debería crear una oferta de trabajo correctamente', async () => {
-      const createJobOfferDtoMock = mock<CreateJobOfferDto>({
-        title: 'Frontend Developer',
-        description: 'Buscamos un desarrollador frontend con experiencia en React.',
-        seniorityId: 1,
-      });
+  it('debería crear una oferta de trabajo correctamente', async () => {
+    const createJobOfferDtoMock: CreateJobOfferDto = {
+      title: 'Frontend Developer',
+      description: 'Buscamos un desarrollador frontend con experiencia en React.',
+      seniorityId: 1,
+    };
 
-      mockJobOfferRepository.create.mockReturnValue(jobOfferMock);
-      mockJobOfferRepository.save.mockResolvedValue(jobOfferMock);
+    mockJobOfferRepository.create.mockReturnValue(jobOfferMock);
+    mockJobOfferRepository.save.mockResolvedValue(jobOfferMock);
 
-      const result = await service.create(createJobOfferDtoMock, 1);
+    const result = await service.create(createJobOfferDtoMock, 1);
 
-      expect(mockJobOfferRepository.create).toHaveBeenCalledWith({
-        title: 'Frontend Developer',
-        description: 'Buscamos un desarrollador frontend con experiencia en React.',
-        seniority: { id: 1 },
-        recruiter: { id: 1 },
-      });
-      expect(mockJobOfferRepository.save).toHaveBeenCalledWith(jobOfferMock);
-      expect(result).toEqual(jobOfferMock);
+    expect(mockJobOfferRepository.create).toHaveBeenCalledWith({
+      title: 'Frontend Developer',
+      description: 'Buscamos un desarrollador frontend con experiencia en React.',
+      seniority: { id: 1 },
+      recruiter: { id: 1 },
     });
-
-    it('debería separar el seniorityId del resto de los datos', async () => {
-      const createJobOfferDtoMock = mock<CreateJobOfferDto>({
-        title: 'Backend Developer',
-        description: 'Buscamos un desarrollador backend.',
-        seniorityId: 2,
-      });
-
-      mockJobOfferRepository.create.mockReturnValue(jobOfferMock2);
-      mockJobOfferRepository.save.mockResolvedValue(jobOfferMock2);
-
-      await service.create(createJobOfferDtoMock, 1);
-
-      expect(mockJobOfferRepository.create).toHaveBeenCalledWith(
-        expect.not.objectContaining({ seniorityId: 2 }),
-      );
-      expect(mockJobOfferRepository.create).toHaveBeenCalledWith(
-        expect.objectContaining({ seniority: { id: 2 } }),
-      );
-    });
-
-    it('debería asignar el recruiterId correctamente', async () => {
-      const createJobOfferDtoMock = mock<CreateJobOfferDto>({
-        title: 'Frontend Developer',
-        description: 'Descripción de prueba.',
-        seniorityId: 1,
-      });
-
-      mockJobOfferRepository.create.mockReturnValue(jobOfferMock);
-      mockJobOfferRepository.save.mockResolvedValue(jobOfferMock);
-
-      await service.create(createJobOfferDtoMock, 5);
-
-      expect(mockJobOfferRepository.create).toHaveBeenCalledWith(
-        expect.objectContaining({ recruiter: { id: 5 } }),
-      );
-    });
+    expect(mockJobOfferRepository.save).toHaveBeenCalledWith(jobOfferMock);
+    expect(result).toEqual(jobOfferMock);
   });
+
+  it('debería separar el seniorityId del resto de los datos', async () => {
+    const createJobOfferDtoMock: CreateJobOfferDto = {
+      title: 'Backend Developer',
+      description: 'Buscamos un desarrollador backend.',
+      seniorityId: 2,
+    };
+
+    mockJobOfferRepository.create.mockReturnValue(jobOfferMock2);
+    mockJobOfferRepository.save.mockResolvedValue(jobOfferMock2);
+
+    await service.create(createJobOfferDtoMock, 1);
+
+    expect(mockJobOfferRepository.create).toHaveBeenCalledWith(
+      expect.not.objectContaining({ seniorityId: 2 }),
+    );
+    expect(mockJobOfferRepository.create).toHaveBeenCalledWith(
+      expect.objectContaining({ seniority: { id: 2 } }),
+    );
+  });
+
+  it('debería asignar el recruiterId correctamente', async () => {
+    const createJobOfferDtoMock: CreateJobOfferDto = {
+      title: 'Frontend Developer',
+      description: 'Descripción de prueba.',
+      seniorityId: 1,
+    };
+
+    mockJobOfferRepository.create.mockReturnValue(jobOfferMock);
+    mockJobOfferRepository.save.mockResolvedValue(jobOfferMock);
+
+    await service.create(createJobOfferDtoMock, 5);
+
+    expect(mockJobOfferRepository.create).toHaveBeenCalledWith(
+      expect.objectContaining({ recruiter: { id: 5 } }),
+    );
+  });
+});
 
   describe('findAll', () => {
     it('debería retornar todas las ofertas con sus relaciones', async () => {
@@ -167,29 +167,20 @@ describe('JobOffersService', () => {
   });
 
   describe('findOne', () => {
-    it('debería retornar una oferta por id sin relaciones', async () => {
+
+    it('debería retornar una oferta por id', async () => {
       mockJobOfferRepository.findOne.mockResolvedValue(jobOfferMock);
 
       const result = await service.findOne(1);
 
       expect(mockJobOfferRepository.findOne).toHaveBeenCalledWith({
         where: { id: 1 },
-        relations: [],
-      });
-      expect(result).toEqual(jobOfferMock);
-    });
-
-    it('debería retornar una oferta por id con relaciones', async () => {
-      mockJobOfferRepository.findOne.mockResolvedValue(jobOfferMock);
-
-      const result = await service.findOne(1, ['seniority', 'recruiter']);
-
-      expect(mockJobOfferRepository.findOne).toHaveBeenCalledWith({
-        where: { id: 1 },
         relations: ['seniority', 'recruiter'],
       });
+
       expect(result).toEqual(jobOfferMock);
     });
+  
 
     it('debería lanzar NotFoundException si la oferta no existe', async () => {
       mockJobOfferRepository.findOne.mockResolvedValue(null);

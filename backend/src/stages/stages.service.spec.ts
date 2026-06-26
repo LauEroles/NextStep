@@ -64,42 +64,41 @@ describe('StagesService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('create', () => {
-    it('debería crear una etapa correctamente', async () => {
-      const createStageDtoMock = mock<CreateStageDto>({
-        name: 'Postulado',
-        sequenceOrder: 1,
-        isTerminal: false,
-      });
+ describe('create', () => {
+  it('debería crear una etapa correctamente', async () => {
+    const createStageDtoMock: CreateStageDto = {
+      name: 'Postulado',
+      sequenceOrder: 1,
+      isTerminal: false,
+    };
 
-      mockStageRepo.create.mockReturnValue(stageMock);
-      mockStageRepo.save.mockResolvedValue(stageMock);
+    mockStageRepo.create.mockReturnValue(stageMock);
+    mockStageRepo.save.mockResolvedValue(stageMock);
 
-      const result = await service.create(createStageDtoMock);
+    const result = await service.create(createStageDtoMock);
 
-      expect(mockStageRepo.create).toHaveBeenCalledWith(createStageDtoMock);
-      expect(mockStageRepo.save).toHaveBeenCalledWith(stageMock);
-      expect(result).toEqual(stageMock);
-    });
-
-    it('debería crear una etapa terminal correctamente', async () => {
-      const createStageDtoMock = mock<CreateStageDto>({
-        name: 'Finalizado',
-        sequenceOrder: 3,
-        isTerminal: true,
-      });
-
-      mockStageRepo.create.mockReturnValue(terminalStageMock);
-      mockStageRepo.save.mockResolvedValue(terminalStageMock);
-
-      const result = await service.create(createStageDtoMock);
-
-      expect(mockStageRepo.create).toHaveBeenCalledWith(createStageDtoMock);
-      expect(result.isTerminal).toBe(true);
-      expect(result).toEqual(terminalStageMock);
-    });
+    expect(mockStageRepo.create).toHaveBeenCalledWith(createStageDtoMock);
+    expect(mockStageRepo.save).toHaveBeenCalledWith(stageMock);
+    expect(result).toEqual(stageMock);
   });
 
+  it('debería crear una etapa terminal correctamente', async () => {
+    const createStageDtoMock: CreateStageDto = {
+      name: 'Finalizado',
+      sequenceOrder: 3,
+      isTerminal: true,
+    };
+
+    mockStageRepo.create.mockReturnValue(terminalStageMock);
+    mockStageRepo.save.mockResolvedValue(terminalStageMock);
+
+    const result = await service.create(createStageDtoMock);
+
+    expect(mockStageRepo.create).toHaveBeenCalledWith(createStageDtoMock);
+    expect(result.isTerminal).toBe(true);
+    expect(result).toEqual(terminalStageMock);
+  });
+});
 
   describe('findAll', () => {
     it('debería retornar todas las etapas ordenadas por sequenceOrder', async () => {
