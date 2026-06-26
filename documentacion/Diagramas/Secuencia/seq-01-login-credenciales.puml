@@ -1,0 +1,43 @@
+@startuml seq-01-login-credenciales
+title NextStep — Login con email y contraseña
+
+actor Usuario
+participant "LoginForm\n(Frontend)" as UI
+participant "NextAuth\n(Credentials)" as NA
+participant "AuthController\nPOST /auth/login" as AC
+participant "AuthService" as AS
+participant "UsersService" as US
+database "PostgreSQL" as DB
+
+Usuario -> UI : Ingresa email + password
+UI -> NA : signIn("credentials", { email, password })
+
+NA -> NA : Valida con Zod\n(email, min 8 chars)
+
+NA -> AC : POST /auth/login\n{ email, password }
+AC -> AS : signIn(email, password)
+AS -> US : findByEmail(email, con password)
+US -> DB : SELECT user + role
+DB --> US : usuario
+
+AS -> AS : bcrypt.compare(password, hash)
+
+alt Credenciales inválidas
+  AS --> AC : 401 Unauthorized
+  AC --> NA : error
+  NA --> UI : null (login fallido)
+else Credenciales válidas
+  AS -> AS : jwtService.signAsync({ id, email, role })
+  AS --> AC : { user, token }
+  AC --> NA : respuesta OK
+
+  alt Usuario inactivo
+    NA --> UI : Error "inactive"
+  else Usuario activo
+    NA -> NA : Guarda token en sesión JWT\n(callback jwt)
+    NA --> UI : Sesión creada
+    UI --> Usuario : Redirige a /{rol}/dashboard
+  end
+end
+
+@enduml

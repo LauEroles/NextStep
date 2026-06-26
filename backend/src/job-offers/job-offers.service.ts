@@ -29,15 +29,22 @@ export class JobOffersService {
     });
   }
 
-  async findOne(id: number, relations?: string[]) {
+  async findOne(id: number) {
     const jobOffer = await this.jobOfferRepository.findOne({
       where: { id },
-      relations: relations || [],
+      relations: ['seniority', 'recruiter'],
     });
     if (!jobOffer) {
       throw new NotFoundException(`No se encontró la oferta.`);
     }
     return jobOffer;
+  }
+
+  async findByRecruiter(recruiterId: number) {
+    return await this.jobOfferRepository.find({
+      where: { recruiter: { id: recruiterId } },
+      relations: ['seniority', 'recruiter'],
+    });
   }
 
   async update(id: number, updateJobOfferDto: UpdateJobOfferDto) {

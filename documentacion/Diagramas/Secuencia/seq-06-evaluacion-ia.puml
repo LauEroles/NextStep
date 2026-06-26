@@ -1,0 +1,61 @@
+@startuml seq-06-evaluacion-ia
+title NextStep — Evaluación del candidato y generación de feedback con IA
+
+actor Reclutador
+participant "FeedbackCard\n(Frontend)" as UI
+participant "FeedbackController" as FC
+participant "ScorecardsController" as SC
+participant "FeedbackService" as FS
+participant "Feedback Chain\n(Chain of Responsibility)" as CHAIN
+participant "ClaudeService" as CLAUDE
+participant "CvService" as CV
+database "PostgreSQL" as DB
+participant "Claude API\n(Haiku)" as API
+
+== A) Guardar evaluación del recruiter ==
+
+Reclutador -> UI : Completa comentario,\nnotas internas y scorecards
+UI -> FC : PATCH /feedback/:id\n{ comment, internalNotes }
+FC -> FS : update(id, dto)
+FS -> DB : UPDATE feedback
+FS --> UI : feedback actualizado
+
+loop Por cada scorecard nueva
+  UI -> SC : POST /scorecards\n{ feedbackId, skillName, score, type }
+  SC -> DB : INSERT scorecard
+end
+
+== B) Generar feedback público con IA ==
+
+Reclutador -> UI : Click "Generar feedback público"
+UI -> FC : POST /feedback/:id/generate
+
+FC -> FS : generateFeedbackForOne(id)
+FS -> DB : SELECT feedback + application\n+ jobOffer + applicant
+FS -> DB : SELECT scorecards del feedback
+
+FS -> CHAIN : handle({ feedback, scorecards })
+
+alt Feedback no existe
+  CHAIN --> UI : 404
+else Sin comentario
+  CHAIN --> UI : 404
+else Sin scorecards
+  CHAIN --> UI : 400
+else Validaciones OK
+  FS -> CV : getLatestCvByUser(applicantId)
+  CV -> DB : SELECT cv_files
+  CV --> FS : CV o null
+
+  FS -> FS : buildSingleStagePrompt()\n(vacante, etapa, scorecards, CV)
+  FS -> CLAUDE : generateFeedback(prompt)
+  CLAUDE -> API : messages.create()\nmodel: claude-haiku
+  API --> CLAUDE : texto generado
+  CLAUDE --> FS : publicFeedback
+
+  FS -> DB : UPDATE feedback.publicFeedback
+  FS --> UI : feedback con texto público
+  UI --> Reclutador : Muestra feedback para el candidato
+end
+
+@enduml

@@ -1,136 +1,196 @@
-## 1. Nombre del Proyecto
+# 🚀 NextStep
 
-**NextStep**
-
----
-
-## 2. Descripción Breve
-
-NextStep es una plataforma digital orientada a mejorar la experiencia de candidatos en procesos de selección.
-
-Permite que un reclutador publique una búsqueda laboral, reciba postulantes y cargue feedback estructurado para cada candidato.
-
-El candidato puede visualizar el estado de su postulación y recibir devoluciones asociadas a su proceso de selección para poder tomar conciencia de los puntos de mejora en su proceso.
+Plataforma digital orientada a revolucionar la experiencia de los candidatos en los procesos de selección, garantizando transparencia, seguimiento en tiempo real y devoluciones constructivas impulsadas por IA.
 
 ---
 
-## 3. Problema a Resolver
+## 📖 1. Descripción Breve
+**NextStep** es un sistema integral de reclutamiento enfocado en el candidato. Permite a los reclutadores publicar búsquedas laborales, gestionar postulantes mediante *scorecards* y generar feedback estructurado (apoyado por Inteligencia Artificial). A su vez, el candidato cuenta con un *Dashboard* interactivo donde puede visualizar una línea de tiempo del estado exacto de sus postulaciones y recibir devoluciones detalladas que fomentan su crecimiento profesional, mitigando el problema del "ghosting" corporativo.
 
-Muchas personas atraviesan procesos de selección sin respuesta o sin feedback.
+---
 
+## 🛑 2. Problema a Resolver
+El ecosistema actual de reclutamiento suele dejar a los candidatos en la incertidumbre. Atraviesan largas fases de entrevistas sin obtener respuestas claras sobre su desempeño.
 Esto genera:
-
-- Ausencia de comunicación o falta de respuesta por parte de la organización durante el proceso de selección 
-- Frustración  
-- Desmotivación  
-- Falta de guía para mejorar profesionalmente  
+- ❌ **Ghosting corporativo**: Ausencia de comunicación al descartar un perfil.
+- 📉 Frustración y desmotivación en el talento.
+- 🧭 Falta de guía, áreas de oportunidad o puntos de mejora para futuros procesos.
 
 ---
 
-## 4. Objetivo del MVP
-
-Crear una plataforma que permita:
-
-- A los reclutadores crear Ofertas laborales  
-- A candidatos se postulan  
-- A reclutadores cargar feedbacks  
-- Visualización de resultados del proceso por parte de los candidatos
+## 🎯 3. Objetivo del MVP
+Crear una plataforma end-to-end que permita:
+- **Reclutadores**: Publicar ofertas, gestionar postulantes por etapas y evaluar perfiles mediante *Scorecards* estructurados, apoyándose en IA para redactar feedbacks precisos.
+- **Candidatos**: Centralizar la carga de su CV en su perfil, postularse a vacantes y tener trazabilidad visual de la etapa exacta en la que se encuentran, recibiendo feedback real y medible.
+- **Administradores**: Gestionar accesos, contenido publicado y usuarios, roles del sistema, y auditar acciones clave.
 
 ---
 
-## 5. Usuarios del Sistema
+## 👥 4. Usuarios del Sistema
 
-### Recruiter
+### 🏢 Recruiter (Reclutador)
+- Crear y administrar ofertas laborales.
+- Visualizar candidatos postulados y descargar sus CVs.
+- Cargar *Scorecards* (evaluaciones técnicas y blandas).
+- Cambiar a los candidatos de etapa (Ej: *Aplicado → Entrevista RRHH → Contratado*).
+- Generar y enviar feedback (Asistido por IA Claude).
 
-Puede:
+### 🧑‍💻 Applicant (Candidato)
+- Ver catálogo de búsquedas disponibles (con buscador reactivo paginado).
+- Administrar su perfil y subir su CV.
+- Postularse a vacantes.
+- Acceder a su panel de control para ver la línea de tiempo de cada postulación y leer el feedback recibido.
 
-- Crear búsquedas laborales  
-- Ver postulantes  
-- Cargar feedback  
-- Cambiar estado de candidatos  
-
-### Candidato
-
-Puede:
-
-- Ver búsquedas disponibles  
-- Postularse  
-- Ver estado del proceso  
-- Ver feedback recibido  
-
-### Admin
-
-Puede:
-
-- Gestionar usuarios  
-- Acceso a historial de logs  
+### 👑 Admin (Administrador)
+- Gestión de usuarios y asignación de roles.
+- Acceso a historial de movimientos (`audit_logs`).
 
 ---
-## Guía de instalación y ejecución
 
-- Plataforma de gestión de postulaciones laborales desarrollada para Programación III (UTN).
-- Stack: Next.js 16 + TypeScript + Tailwind CSS (frontend) | NestJS + TypeORM + PostgreSQL/Supabase (backend)
+## 🛠️ 5. Stack Tecnológico
 
-### Repositorios
+**Frontend:**
+- **Next.js 16** (App Router) + React
+- **TypeScript**
+- **Tailwind CSS**
+- **NextAuth.js** (Gestión de sesiones) + **Zod** (Validaciones de esquema)
 
-| Repositorio | URL |
+**Backend:**
+- **NestJS** + **TypeScript**
+- **PostgreSQL** alojado en Supabase (Session Pooler)
+- **TypeORM** (Mapeo relacional de objetos)
+- **Swagger** (Documentación OpenAPI)
+- **Jest** (Testing unitario con +80% de cobertura)
+- **Helmet / bcrypt / JWT** (Capa de seguridad)
+- **Multer** (Gestión y subida de archivos físicos)
+
+**Integraciones Externas:**
+- **Anthropic API (Claude)** para síntesis y generación automática de feedback.
+
+---
+
+## ⚙️ 6. Guía de Instalación y Ejecución
+
+El sistema está dividido en dos repositorios independientes. Se requieren dos terminales para correr el proyecto completo.
+
+| Entorno | Repositorio |
 | :--- | :--- |
-| Backend (API) | https://github.com/LauEroles/NextStep |
-| Frontend (App) | https://github.com/FloritoM/NextStep_TP |
+| **Backend (API)** | [https://github.com/LauEroles/NextStep](https://github.com/LauEroles/NextStep) |
+| **Frontend (App)** | [https://github.com/FloritoM/NextStep_TP](https://github.com/FloritoM/NextStep_TP) |
 
-Cada repositorio se instala y corre de forma independiente. Se necesitan dos terminales abiertas para correr el proyecto completo.
-
-### Requisitos previos
-
+#### Requisitos previos:
 - Node.js v18 o superior
 - npm v9 o superior
 - Git
 
-### Backend
+---
 
-1.1 Clonar el repositorio
+### 💻 Levantando el Backend (API)
 
-bashgit clone https://github.com/LauEroles/NextStep.git
+ **1. Clonar el repositorio e instalar dependencias:**
+```bash
+git clone https://github.com/LauEroles/NextStep.git
 cd NextStep/backend
+npm install
+```
 
-1.2 Instalar dependencias
+**2. Variables de Entorno (`.env`):**\
+Cree un archivo `.env` en la raíz de la carpeta backend basándose en el `.env.example`:
+```bash
+cp .env.example .env
+``` 
 
-bashnpm install
+#### Entorno y Puerto
+`PORT=3001`\
+`NODE_ENV=development`
 
-1.3 Variables de entorno
+La variable `NODE_ENV=development` es fundamental para que la documentación interactiva de Swagger esté habilitada localmente. Al pasar a producción, se desactiva.
 
-Crear el archivo .env dentro de la carpeta backend/ con el siguiente contenido:
+#### Base de datos (Supabase)
+`DATABASE_URL=tu_url`
 
-env# Base de datos (Supabase — usar Session Pooler, NO Direct Connection)
-DATABASE_URL=postgresql://postgres.[PROJECT_REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres
+#### Seguridad y JWT
+`JWT_SECRET=tu_secreto_super_seguro`
 
-# JWT
-JWT_SECRET=tu_secreto_jwt_aqui
-JWT_EXPIRES_IN=8h
+*Sugerencia:* Para generar una clave criptográficamente segura de forma rápida en su terminal, puede ejecutar el siguiente comando e incorporar el resultado en esta variable:
+```bash
+npx uuid-cli  # Otra opción: npx auth secret
+```
 
-# Puerto
-PORT=3001
+#### Integración con IA
+`CLAUDE_API_KEY=tu_api_key_de_anthropic`
 
+#### Datos de Seed (Inicialización de Base de Datos)
+`DEFAULT_ADMIN_EMAIL=tu_mail`\
+`DEFAULT_ADMIN_PASSWORD=tu_password`
 
-Importante: La URL de Supabase debe ser la del Session Pooler (no la Direct Connection). Algunas redes bloquean el puerto directo de Postgres.
+Estas variables definen las credenciales del usuario con rol `ADMIN` que será creado automáticamente al ejecutar el script de *seed*. Su configuración es obligatoria para garantizar el acceso inicial al panel de administración y evaluar sus respectivas funcionalidades.
 
+*Importante:* Tanto el correo electrónico como la contraseña especificados deben cumplir estrictamente con las políticas de validación implementadas en el backend mediante `class-validator`.
+Si cualquiera de estos campos no supera las restricciones lógicas del DTO, la ejecución del script de inicialización fallará.
 
-1.4 Levantar el backend
+#### Sincronización automática de entidades con la base de datos (TypeORM)
+`DB_SYNC=false`
 
-bashnpm run start:dev
+*Nota sobre arquitectura:* El valor `false` garantiza que no se realicen alteraciones automáticas destructivas sobre el esquema en ejecución. Toda modificación estructural debe ser gestionada estrictamente mediante el sistema de migraciones.
 
-El servidor queda disponible en http://localhost:3001
+**3. Inicialización de la Base de Datos (Seed):**\
+Para evaluar el correcto funcionamiento del sistema, se presentan dos opciones alternativas de conectividad.
 
-1.5 Dependencias principales
+#### 🔹 Opción A: Despliegue en una Instancia Nueva Independiente (Recomendado)
+Esta opción permite validar la portabilidad de la aplicación construyendo el esquema y poblando los datos maestros desde cero en un entorno limpio.
 
-| Paquete | Uso |
-| :--- | :--- |
-| @nestjs/core | Framework principal |
-| @nestjs/jwt | Autenticación JWT |
-| @nestjs/passport | Estrategias de autenticación |
-| typeorm + @nestjs/typeorm | ORM para PostgreSQL |
-| bcrypt | Hash de contraseñas |
-| multer | Subida de archivos (CVs) |
-| @nestjs/config | Variables de entorno |
-| class-validator | Validación de DTOs |
-| helmet| Seguridad HTTP headers |
+1. Genere un proyecto nuevo y vacío en su panel de Supabase.
+
+2. Copie la cadena de conexión (URI Connection String) provista por la plataforma y configúrela en la variable DATABASE_URL de su archivo .env.
+
+3. Construya la estructura relacional de tablas ejecutando las migraciones integradas:
+```bash
+npm run migration:run
+```
+
+4. Inyecte los registros iniciales y las credenciales del administrador ejecutando el script de población:
+```bash
+npm run seed
+```
+
+#### 🔹 Opción B: Conexión Directa a la Base de Datos Original del Proyecto
+Si prefiere omitir la creación de una nueva infraestructura, puede solicitar al equipo la cadena de conexión correspondiente a la base de datos activa en la nube.
+
+1. Configure la DATABASE_URL provista por el equipo en su archivo .env.
+
+2. Dado que esta instancia ya cuenta con la estructura del esquema relacional y los datos maestros persistidos, no es necesario ejecutar los comandos de migración ni de seed. El sistema se encontrará listo para operar inmediatamente.
+
+*Nota:* El seed crea automáticamente un usuario Administrador leyendo las variables `DEFAULT_ADMIN_EMAIL` y `DEFAULT_ADMIN_PASSWORD` del `.env`. En un entorno de producción real, este proceso de inyección de credenciales se maneja de forma segura a través de variables de entorno del servidor.
+
+**4. Iniciar el Servidor:**
+- En modo desarrollo:
+```bash
+npm run start:dev
+```
+- O compilar y ejecutar:
+```bash
+npm run build
+npm run start
+```
+
+El servidor backend quedará disponible en `http://localhost:3001`
+
+---
+
+## 📚 7. Documentación de la API (Swagger)
+Con el backend corriendo en modo desarrollo, la documentación completa y detallada de todos los endpoints, DTOs y esquemas de respuesta está disponible de forma interactiva en:
+👉 `http://localhost:3001/api-docs`
+
+Nota: Requiere autenticación Bearer JWT para probar endpoints protegidos.
+
+---
+
+## 🧪 8. Testing
+El proyecto cuenta con una suite de pruebas unitarias implementada con Jest y jest-mock-extended para garantizar la estabilidad de la lógica de negocio (como el borrado seguro de entidades y dependencias).
+
+Para correr los tests:
+
+```bash
+npm run test
+```

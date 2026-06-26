@@ -29,4 +29,14 @@ export class CvService {
   async getCvsByUser(userId: number): Promise<CvFile[]> {
     return this.cvRepo.find({ where: { userId } });
   }
+  
+  
+  async getLatestCvByUser(userId: number): Promise<CvFile | null> {
+    return this.cvRepo.findOne({
+      where: { userId },
+      order: { createdAt: 'DESC' },
+    });
+  }
+  
+
 }

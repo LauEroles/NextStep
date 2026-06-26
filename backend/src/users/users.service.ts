@@ -12,6 +12,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { RolesService } from '../roles/roles.service';
 import { Role } from '../roles/entities/role.entity';
+import { ActiveUser } from '../auth/interfaces/active-user.interface';
 
 @Injectable()
 export class UsersService {
@@ -19,7 +20,7 @@ export class UsersService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly rolesService: RolesService,
-  ) {}
+  ) { }
 
   async create(createUserDto: CreateUserDto) {
     const userExists = await this.findByEmail(createUserDto.email);
@@ -42,6 +43,7 @@ export class UsersService {
 
     const newUser = this.userRepository.create({
       ...userFields,
+      email: userFields.email.toLowerCase(),
       password: hashedPassword,
       role: userRole,
     });
@@ -85,13 +87,33 @@ export class UsersService {
     return await this.userRepository.findOneBy({ email: emailLowerCase });
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(
+    id: number,
+    updateUserDto: UpdateUserDto,
+    currentUser: ActiveUser,
+  ) {
+    const isAdmin = currentUser.role === 'admin';
+    if (!isAdmin && currentUser.id !== id) {
+      throw new ForbiddenException(
+        'No tenés permisos para modificar este perfil.',
+      );
+    }
     const user = await this.findOne(id);
+
+    if (updateUserDto.email && updateUserDto.email.toLowerCase() !== user.email.toLowerCase()) {
+      const emailExists = await this.findByEmail(updateUserDto.email);
+      if (emailExists) {
+        throw new ConflictException('El correo electrónico ya está registrado');
+      }
+    }
+
     if (updateUserDto.password) {
       updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
     }
     const updatedUser = this.userRepository.merge(user, updateUserDto);
-    return await this.userRepository.save(updatedUser);
+    const savedUser = await this.userRepository.save(updatedUser);
+    const { password: _pass, ...result } = savedUser;
+    return result;
   }
 
   async remove(id: number) {

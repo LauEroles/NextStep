@@ -18,6 +18,6 @@ import { ApplicationFactory } from './factories/application.factory';
   ],
   controllers: [JobApplicationsController],
   providers: [JobApplicationsService, ApplicationFactory],
-  exports: [JobApplicationsService],
+  exports: [JobApplicationsService,TypeOrmModule],
 })
 export class JobApplicationsModule {}

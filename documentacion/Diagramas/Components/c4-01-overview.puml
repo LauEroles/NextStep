@@ -1,0 +1,34 @@
+@startuml NextStep - Overview
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+LAYOUT_TOP_DOWN()
+title NextStep — Vista General del Sistema
+
+Person(applicant, "Postulante")
+Person(recruiter, "Reclutador")
+Person(admin, "Administrador")
+
+System_Ext(google, "Google OAuth")
+System_Ext(claude, "Claude API (IA)")
+System_Ext(supabase, "Supabase Dashboard")
+
+System_Boundary(nextstep, "NextStep") {
+  Container(frontend, "Frontend", "Next.js 16", "UI por rol: applicant, recruiter, admin")
+  Container(backend, "Backend API", "NestJS 11", "REST + JWT + TypeORM")
+  ContainerDb(database, "Base de Datos", "PostgreSQL", "Supabase — datos del sistema")
+  Container(files, "Archivos CV", "Disco local", "uploads/cv/")
+}
+
+Rel(applicant, frontend, "Usa", "HTTPS")
+Rel(recruiter, frontend, "Usa", "HTTPS")
+Rel(admin, frontend, "Usa", "HTTPS")
+
+Rel(frontend, backend, "REST/JSON + JWT", "HTTPS")
+Rel(backend, database, "SQL", "SSL")
+Rel(backend, files, "Guarda CVs")
+Rel(frontend, google, "Login social")
+Rel(backend, claude, "Genera feedback público")
+Rel(supabase, database, "Administra")
+
+@enduml

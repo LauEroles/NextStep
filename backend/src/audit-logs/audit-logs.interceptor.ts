@@ -20,7 +20,6 @@ export class AuditLogsInterceptor implements NestInterceptor {
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
         const request = context.switchToHttp().getRequest();
 
-
         const action = METHOD_ACTION_MAP[request.method];
         if (request.url.includes('/auth/login')) {
             return next.handle();
@@ -50,9 +49,11 @@ export class AuditLogsInterceptor implements NestInterceptor {
                 if (request.url === '/auth/register') {
                     entity = 'User';
                 }
-                const entity_id = String(responseBody?.id ?? request.params?.id ?? '');
 
-                this.auditLogsService.create({ userId, action, entity, entity_id });
+                const rawId = responseBody?.id ?? request.params?.id;
+                const entityId = rawId !== undefined ? Number(rawId) : null;
+
+                this.auditLogsService.create({ userId, action, entity, entityId});
             }),
         );
     }

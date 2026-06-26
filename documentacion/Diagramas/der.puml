@@ -71,11 +71,10 @@ entity "feedbacks" as feedbacks {
 entity "audit_logs" as audit_logs {
   * id : number <<PK>>
   --
-  user_email : number <<FK>>
+  user_id : number <<FK>>
   * action : VARCHAR(100)
-  * table_name : VARCHAR(100)
-  record_id : VARCHAR(255)
-  metadata : JSONB
+  * entity : VARCHAR(100)
+  entity_id : INT
   created_at : TIMESTAMP
 }
 
@@ -106,8 +105,6 @@ roles ||--o{ users : "define el perfil de"
 ' Relaciones de Ofertas y Skills/Seniority
 users ||--o{ job_offers : "crea (recruiter)"
 seniorities ||--o{ job_offers : "categoriza"
-job_offers ||--o{ job_offer_skills : "requiere"
-skills ||--o{ job_offer_skills : "pertenece a"
 
 ' Relaciones de Postulaciones y Etapas
 users ||--o{ applications : "se postula (applicant)"
