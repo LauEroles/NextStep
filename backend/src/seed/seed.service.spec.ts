@@ -54,6 +54,12 @@ describe('SeedService', () => {
     );
   });
 
+  afterEach(() => {
+    delete process.env.DEFAULT_ADMIN_EMAIL;
+    delete process.env.DEFAULT_ADMIN_PASSWORD;
+    jest.clearAllMocks();
+  });
+
   it('should seed roles, seniorities, stages and create the admin user when the tables are empty', async () => {
     process.env.DEFAULT_ADMIN_EMAIL = 'admin@nextstep.test';
     process.env.DEFAULT_ADMIN_PASSWORD = 'super-secret';
@@ -97,5 +103,44 @@ describe('SeedService', () => {
       }),
     );
     expect(userRepo.save).toHaveBeenCalled();
+  });
+
+  it('should skip seeding when all repositories already contain data', async () => {
+    roleRepo.count.mockResolvedValue(1);
+    seniorityRepo.count.mockResolvedValue(1);
+    stageRepo.count.mockResolvedValue(1);
+    userRepo.count.mockResolvedValue(1);
+
+    await service.runSeed();
+
+    expect(roleRepo.save).not.toHaveBeenCalled();
+    expect(seniorityRepo.save).not.toHaveBeenCalled();
+    expect(stageRepo.save).not.toHaveBeenCalled();
+    expect(userRepo.create).not.toHaveBeenCalled();
+    expect(userRepo.save).not.toHaveBeenCalled();
+  });
+
+  it('should throw when the admin role is missing', async () => {
+    roleRepo.count.mockResolvedValue(0);
+    seniorityRepo.count.mockResolvedValue(1);
+    stageRepo.count.mockResolvedValue(1);
+    userRepo.count.mockResolvedValue(0);
+    roleRepo.findOne.mockResolvedValue(undefined);
+
+    await expect(service.runSeed()).rejects.toThrow(
+      'No se encontró el rol de administrador. Verifique la carga de roles.',
+    );
+  });
+
+  it('should throw when the admin credentials are missing', async () => {
+    roleRepo.count.mockResolvedValue(0);
+    seniorityRepo.count.mockResolvedValue(1);
+    stageRepo.count.mockResolvedValue(1);
+    userRepo.count.mockResolvedValue(0);
+    roleRepo.findOne.mockResolvedValue({ id: 1, name: 'admin' });
+
+    await expect(service.runSeed()).rejects.toThrow(
+      'Las variables de entorno DEFAULT_ADMIN_EMAIL y DEFAULT_ADMIN_PASSWORD deben estar definidas.',
+    );
   });
 });
