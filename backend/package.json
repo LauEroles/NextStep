@@ -98,6 +98,9 @@
       "!**/*.dto.ts",
       "!**/*.entity.ts",
       "!**/multer.config.{js,ts}",
+      "!**/migrations/**",
+      "!**/data-source.ts",
+      "!**/main-seed.ts",
       "!main.ts",
       "!**/index.{js,ts}"
     ],
