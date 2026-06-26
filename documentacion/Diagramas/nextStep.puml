@@ -1,27 +1,20 @@
-@startuml NextStep Class Diagram Entities Explicit
+@startuml NextStep Diagrama de Clases
 
 class Role {
   + id : number
   + name : string
   + isDefault : boolean
-
 }
 
 class User {
   + id : number
   + email : string
-  - password : string
+  - passwordHash : string
   + firstName : string
   + lastName : string
-  + isActive : boolean
   + createdAt : Date
   + updatedAt : Date
   + role : Role
-}
-
-class Skill {
-  + id : number
-  + name : string
 }
 
 class Seniority {
@@ -38,7 +31,6 @@ class JobOffer {
   + updatedAt : Date
   + recruiter : User
   + seniority : Seniority
-  + skills : Skill[]
 }
 
 class Stage {
@@ -46,12 +38,11 @@ class Stage {
   + name : string
   + sequenceOrder : number
   + isTerminal : boolean
-
+  + isHiredStage : boolean
 }
 
 class Application {
   + id : number
-  + cvPath : string
   + appliedAt : Date
   + updatedAt : Date
   + applicant : User
@@ -70,15 +61,15 @@ class Feedback {
   + createdAt : Date
   + application : Application
   + recruiter : User
-  + scorecards : Scorecard[]
   + stage : Stage
+  + scorecards : Scorecard[]
 }
 
 class Scorecard {
   + id : number
   + skillName : string
   + score : number
-  + type : string
+  + type : 'technical' | 'soft'
   + createdAt : Date
   + feedback : Feedback
 }
@@ -95,30 +86,29 @@ class CvFile {
 
 class AuditLog {
   + id : number
-  + action : string
-  + tableName : string
-  + recordId : string
-  + metadata : any
-  + createdAt : Date
   + user : User
+  + action : string
+  + entity : string
+  + entityId : number
+  + createdAt : Date
 }
 
-' Flechas visuales para conectar el mapa
-User "many" --> "1" Role
-JobOffer "many" --> "1" User
-JobOffer "many" --> "1" Seniority
-JobOffer "many" --> "many" Skill
+' Relaciones
+User "many" --> "1" Role : "tiene"
+User "many" --> "1" CvFile : "sube"
+User "many" --> "1" AuditLog : "genera"
+User "1" --> "many" JobOffer : "recruiter"
+User "1" --> "many" Application : "applicant"
+User "1" --> "many" Feedback : "escribe"
 
-Application "many" --> "1" User
-Application "many" --> "1" JobOffer
-Application "many" --> "1" Stage
+Seniority "1" --> "many" JobOffer : "categoriza"
 
-Application "1" *-- "many" Feedback
-Feedback "many" --> "1" Stage
-Feedback "many" --> "1" User
+JobOffer "1" --> "many" Application : "recibe"
 
-CvFile "many" --> "1" User
+Stage "1" --> "many" Application : "estado actual"
+Stage "1" --> "many" Feedback : "identifica momento"
 
-AuditLog "many" --> "1" User
+Application "1" *-- "many" Feedback : "tiene"
+Feedback "1" *-- "many" Scorecard : "contiene"
 
 @enduml

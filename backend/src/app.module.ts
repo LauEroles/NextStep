@@ -31,7 +31,7 @@ import { JwtModule } from '@nestjs/jwt';
         ssl: { rejectUnauthorized: false },
       },
       autoLoadEntities: true,
-      synchronize: true,
+      synchronize: process.env.DB_SYNC === 'true',
     }),
     UsersModule,
     FeedbackModule,
