@@ -91,16 +91,25 @@
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverage": true,
-    "collectCoverageFrom": ["**/*.{js,jsx,ts,tsx}",
+    "collectCoverageFrom": [
+      "**/*.{js,jsx,ts,tsx}",
       "!**/*.module.ts",
       "!**/*.decorator.ts",
       "!**/*.dto.ts",
       "!**/*.entity.ts",
       "!**/multer.config.{js,ts}",
       "!main.ts",
-      "!**/multer.config.{js,ts}" ,
-      "!**/index.{js,ts}"],
+      "!**/index.{js,ts}"
+    ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "coverageThreshold": {
+      "global": {
+        "statements": 80,
+        "branches": 80,
+        "functions": 80,
+        "lines": 80
+      }
+    }
   }
 }
