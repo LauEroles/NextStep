@@ -101,9 +101,14 @@ export class FeedbackService {
     return feedback;
   }
 
-  async update(id: number, updateFeedbackDto: UpdateFeedbackDto) {
+  async update(id: number, updateFeedbackDto: UpdateFeedbackDto, recruiterId: number) {
     const feedback = await this.findOne(id);
     const updated = Object.assign(feedback, updateFeedbackDto);
+
+    if(recruiterId){
+      updated.recruiter = { id: recruiterId } as any;
+    }
+
     return await this.feedbackRepository.save(updated);
   }
 
