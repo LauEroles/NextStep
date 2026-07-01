@@ -162,8 +162,9 @@ export class FeedbackController {
   update(
     @Param('id') id: string,
     @Body() updateFeedbackDto: UpdateFeedbackDto,
+    @CurrentUser() currentUser: ActiveUser
   ) {
-    return this.feedbackService.update(+id, updateFeedbackDto);
+    return this.feedbackService.update(+id, updateFeedbackDto, currentUser.id);
   }
 
   @Roles('admin', 'recruiter')
